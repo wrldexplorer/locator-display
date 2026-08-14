@@ -35,7 +35,7 @@ public abstract class PlayerListEntryMixin {
 	@Inject(method = "getDisplayName", at = @At("RETURN"), cancellable = true)
 	private void addLocatorColorDot(CallbackInfoReturnable<Text> cir) {
 		GameProfile profile = getProfile();
-		String playerName = profile.name();
+		String playerName = profile.getName();
 
 		// skip unnamed entries - npc? etc? whatever server have
 		if (playerName == null || playerName.isEmpty()) {
