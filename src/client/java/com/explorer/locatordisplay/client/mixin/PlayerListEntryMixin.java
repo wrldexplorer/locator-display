@@ -3,10 +3,10 @@ package com.explorer.locatordisplay.client.mixin;
 import com.explorer.locatordisplay.client.LocatorColorUtil;
 import com.explorer.locatordisplay.client.UuidResolver;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-@Mixin(PlayerListEntry.class)
+@Mixin(PlayerInfo.class)
 public abstract class PlayerListEntryMixin {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("LocatorDisplay");
@@ -32,8 +32,8 @@ public abstract class PlayerListEntryMixin {
 	@Shadow
 	public abstract GameProfile getProfile();
 
-	@Inject(method = "getDisplayName", at = @At("RETURN"), cancellable = true)
-	private void addLocatorColorDot(CallbackInfoReturnable<Text> cir) {
+	@Inject(method = "getTabListDisplayName", at = @At("RETURN"), cancellable = true)
+	private void addLocatorColorDot(CallbackInfoReturnable<Component> cir) {
 		GameProfile profile = getProfile();
 		String playerName = profile.name();
 
@@ -71,15 +71,15 @@ public abstract class PlayerListEntryMixin {
 		 * Modifies the player name, by inserting the 'colored dot' in the beginning
 		 * Might not be the best/safest implementation :\
 		 */
-		Text originalName = cir.getReturnValue();
+		Component originalName = cir.getReturnValue();
 		if (originalName == null) {
-			originalName = Text.literal(playerName);
+			originalName = Component.literal(playerName);
 		}
 
-		Text dotSymbol = Text.literal("● ")
+		Component dotSymbol = Component.literal("● ")
 				.setStyle(Style.EMPTY.withColor(rgbColor));
 
-		MutableText modifiedName = Text.empty()
+		MutableComponent modifiedName = Component.empty()
 				.append(dotSymbol)
 				.append(originalName);
 

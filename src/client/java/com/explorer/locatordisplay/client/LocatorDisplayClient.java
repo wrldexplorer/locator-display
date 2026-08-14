@@ -1,7 +1,7 @@
 package com.explorer.locatordisplay.client;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ LOCATOR DISPLAY - a client-sided locator bar color display mod
 
 	@Override
 	public void onInitializeClient() {
-		String username = MinecraftClient.getInstance().getSession().getUsername();
+		String username = Minecraft.getInstance().getUser().getName();
 		LOGGER.info("hihihi {}", username);
 		LOGGER.info("Locator Display mod initialized!");
 		LOGGER.info("\n{}", MOD_ART);
