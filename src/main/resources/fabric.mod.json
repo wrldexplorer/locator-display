@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "locator-display",
+	"version": "${version}",
+	"name": "Locator Display",
+	"description": "Just a client-sided locator bar color display mod!",
+	"authors": [
+		"WRLDExplorer"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/wrldexplorer/locator-display"
+	},
+	"license": "GPL-3.0-only",
+	"icon": "assets/locator-display/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"com.explorer.locatordisplay.client.LocatorDisplayClient"
+		]
+	},
+	"mixins": [
+		{
+			"config": "locator-display.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~1.21.11",
+		"java": ">=21"
+	}
+}

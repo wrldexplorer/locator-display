@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.explorer.locatordisplay.client.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"PlayerListEntryMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
