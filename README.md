@@ -48,6 +48,9 @@ Assets (logo/icon): CC BY-NC-ND 4.0 (see [LICENSE-ASSETS](LICENSE-ASSETS))
 
 ## Contributing
 Open an issue if you find a bug or have a feature request.
+If you want to contribute code-wise, make sure to check the [TODO](TODO) file.
+By contributing to this repository you agree that your additions will be licensed
+under GPLv3-only and you agree to allow distribution in compiled form.
 
 ## Credits
 Based on the Fabric example mod template (CC0).

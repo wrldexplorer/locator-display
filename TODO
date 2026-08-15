@@ -1,0 +1,7 @@
+Bugs:
+The hue color is darker than the color in the locator bar
+
+Features:
+Make the 'dot' the shape of the locator bar icon
+Add proximity detection(dot gets smaller/bigger according to the distance)
+Add options to turn it off
