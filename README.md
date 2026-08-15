@@ -16,9 +16,9 @@ The color is determined by the player's Minecraft UUID, just like the locator ba
 <img src="assets/screenshots/inventory.png" alt="Locator Display Logo" width="720">
 
 ## Requirements
-- Minecraft 1.21.11
-- Fabric Loader 0.19.3 or later
-- Java 21 or later
+- Minecraft 1.21.6+
+- Fabric Loader 0.19.3+
+- Java 21+
 
 ## Installation
 1. Download the latest `.jar` from the [Releases](../../releases) page.
