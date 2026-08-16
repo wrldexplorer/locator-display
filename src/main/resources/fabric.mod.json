@@ -17,6 +17,9 @@
 	"entrypoints": {
 		"client": [
 			"com.explorer.locatordisplay.client.LocatorDisplayClient"
+		],
+		"modmenu": [
+			"com.explorer.locatordisplay.client.LocatorDisplayClient"
 		]
 	},
 	"mixins": [
@@ -29,5 +32,18 @@
 		"fabricloader": ">=0.19.3",
 		"minecraft": ">=26.1 <26.3",
 		"java": ">=25"
+	},
+	"suggests": {
+		"modmenu": "*",
+		"cloth-config": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": ""
+			},
+			"badges": [ "client" ],
+			"update_checker": true
+		}
 	}
 }

@@ -1,12 +1,15 @@
 package com.explorer.locatordisplay.client.mixin;
 
 import com.explorer.locatordisplay.client.LocatorColorUtil;
+import com.explorer.locatordisplay.client.LocatorDisplayConfig;
 import com.explorer.locatordisplay.client.UuidResolver;
+
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.Component;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,6 +37,10 @@ public abstract class PlayerListEntryMixin {
 
 	@Inject(method = "getTabListDisplayName", at = @At("RETURN"), cancellable = true)
 	private void addLocatorColorDot(CallbackInfoReturnable<Component> cir) {
+		if (!LocatorDisplayConfig.enabled) {
+			return;
+		}
+
 		GameProfile profile = getProfile();
 		String playerName = profile.name();
 
@@ -65,6 +72,7 @@ public abstract class PlayerListEntryMixin {
 
 		if (loggedPlayerNames.add(playerName.toLowerCase())) {
 			LOGGER.info("Added locator dot for '{}' with UUID '{}'", playerName, uuid);
+			LOGGER.info("Calculated hex code is: #{}", String.format("%06X", rgbColor));
 		}
 
 		/**
