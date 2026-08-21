@@ -40,7 +40,8 @@
 	"custom": {
 		"modmenu": {
 			"links": {
-				"modmenu.discord": ""
+				"modmenu.discord": "",
+				"modmenu.github": ""
 			},
 			"badges": [ "client" ],
 			"update_checker": true

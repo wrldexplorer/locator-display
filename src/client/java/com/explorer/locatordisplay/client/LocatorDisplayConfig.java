@@ -17,6 +17,23 @@ public class LocatorDisplayConfig {
             FabricLoader.getInstance().getConfigDir().resolve("locator-display.properties");
 
     public static boolean enabled = true;
+    public static final String[] SYMBOLS = {"⬤", "▌", "⬛", "★", "◆", "▶", "✚", "✖", "Custom"};
+    public static int symbolIndex = 0;
+    public static String customSymbol = "";
+    public static boolean isCustomSelected() {
+        return symbolIndex >= 0 && symbolIndex < SYMBOLS.length && SYMBOLS[symbolIndex].equals("Custom");
+    }
+    public static String getCurrentSymbol() {
+        if (symbolIndex < 0 || symbolIndex >= SYMBOLS.length) {
+            symbolIndex = 0;
+        }
+
+        if (isCustomSelected()) {
+            return customSymbol;
+        }
+
+        return SYMBOLS[symbolIndex];
+    }
 
     public static void load() {
         if (Files.exists(CONFIG_FILE)) {

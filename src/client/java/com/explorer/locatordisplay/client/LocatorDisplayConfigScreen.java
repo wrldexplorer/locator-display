@@ -2,12 +2,14 @@ package com.explorer.locatordisplay.client;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
 public class LocatorDisplayConfigScreen extends Screen {
     private final Screen parent;
+    private EditBox customSymbolBox;
 
     public LocatorDisplayConfigScreen(Screen parent) {
         super(Component.literal("Locator Display Config"));
@@ -16,6 +18,10 @@ public class LocatorDisplayConfigScreen extends Screen {
 
     @Override
     protected void init() {
+        int centerX = this.width / 2 - 75;
+        int startY = this.height / 2 - 50;
+        int spacing = 24;
+
         // toggle on/off button
         this.addRenderableWidget(
                 Button.builder(
@@ -27,8 +33,51 @@ public class LocatorDisplayConfigScreen extends Screen {
                             );
                             LocatorDisplayConfig.save();
                         }
-                ).bounds(this.width / 2 - 75, this.height / 2 - 20, 150, 20).build()
+                ).bounds(centerX, startY, 150, 20).build()
         );
+
+        // symbol customizer button
+        this.addRenderableWidget(
+                Button.builder(
+                        Component.literal("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.symbolIndex]),
+                        button -> {
+                            LocatorDisplayConfig.symbolIndex = (LocatorDisplayConfig.symbolIndex + 1) % LocatorDisplayConfig.SYMBOLS.length;
+
+                            boolean customActive = LocatorDisplayConfig.isCustomSelected();
+
+                            button.setMessage(
+                                    Component.literal("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.symbolIndex])
+                            );
+
+                            // Enable/disable text box interaction depending on selection
+                            customSymbolBox.setEditable(customActive);
+                            if (!customActive) {
+                                customSymbolBox.setFocused(false);
+                            }
+
+                            LocatorDisplayConfig.save();
+                        }
+                ).bounds(centerX, startY + spacing, 150, 20).build()
+        );
+
+        // custom symbol textbox
+        this.customSymbolBox = new EditBox(
+                this.font,
+                centerX,
+                startY + (spacing * 2),
+                150,
+                20,
+                Component.literal("Custom Symbol")
+        );
+        this.customSymbolBox.setHint(Component.literal("> "));
+        this.customSymbolBox.setValue(LocatorDisplayConfig.customSymbol);
+        this.customSymbolBox.setEditable(LocatorDisplayConfig.isCustomSelected());
+        this.customSymbolBox.setResponder(text -> {
+            if (text.length() > 2) LocatorDisplayConfig.customSymbol = text; //max char 3
+            else                   LocatorDisplayConfig.customSymbol = "";
+            LocatorDisplayConfig.save();
+        });
+        this.addRenderableWidget(this.customSymbolBox);
 
         // done button
         this.addRenderableWidget(
@@ -36,10 +85,10 @@ public class LocatorDisplayConfigScreen extends Screen {
                         Component.literal("Done"),
                         button -> {
                             if (this.minecraft != null) {
-                                this.minecraft.setScreen(this.parent);
+                                this.minecraft.gui.setScreen(this.parent);
                             }
                         }
-                ).bounds(this.width / 2 - 75, this.height / 2 + 10, 150, 20).build()
+                ).bounds(centerX, startY + (spacing * 3) + 6, 150, 20).build()
         );
     }
 

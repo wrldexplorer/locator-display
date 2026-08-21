@@ -84,11 +84,12 @@ public abstract class PlayerListEntryMixin {
 			originalName = Component.literal(playerName);
 		}
 
-		Component dotSymbol = Component.literal("● ")
+		String pickedSymbol = LocatorDisplayConfig.getCurrentSymbol() + " ";
+		Component nameSymbol = Component.literal(pickedSymbol)
 				.setStyle(Style.EMPTY.withColor(rgbColor));
 
 		MutableComponent modifiedName = Component.empty()
-				.append(dotSymbol)
+				.append(nameSymbol)
 				.append(originalName);
 
 		cir.setReturnValue(modifiedName);
