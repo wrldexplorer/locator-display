@@ -85,7 +85,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                         Component.literal("Done"),
                         button -> {
                             if (this.minecraft != null) {
-                                this.minecraft.gui.setScreen(this.parent);
+                                this.minecraft.setScreen(this.parent);
                             }
                         }
                 ).bounds(centerX, startY + (spacing * 3) + 6, 150, 20).build()
