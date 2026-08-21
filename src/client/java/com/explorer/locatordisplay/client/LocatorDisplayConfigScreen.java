@@ -69,12 +69,12 @@ public class LocatorDisplayConfigScreen extends Screen {
                 20,
                 Component.literal("Custom Symbol")
         );
-        this.customSymbolBox.setHint(Component.literal("> "));
+        this.customSymbolBox.setHint(Component.literal("> Custom (max length 3)"));
         this.customSymbolBox.setValue(LocatorDisplayConfig.customSymbol);
         this.customSymbolBox.setEditable(LocatorDisplayConfig.isCustomSelected());
         this.customSymbolBox.setResponder(text -> {
-            if (text.length() > 2) LocatorDisplayConfig.customSymbol = text; //max char 3
-            else                   LocatorDisplayConfig.customSymbol = "";
+            if (!text.isEmpty() && text.length() <= 3) LocatorDisplayConfig.customSymbol = text; //max char 3
+            else                   LocatorDisplayConfig.customSymbol = "⬤";
             LocatorDisplayConfig.save();
         });
         this.addRenderableWidget(this.customSymbolBox);

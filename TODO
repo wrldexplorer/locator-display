@@ -1,10 +1,4 @@
-Bugs:
-The hue color is darker than the color in the locator bar - FIXED
-
 Features:
-Make the 'dot' the shape of the locator bar icon
+Make the symbol the shape of the locator bar icon
 Add proximity detection option on/off
 Add proximity detection(dot gets smaller/bigger according to the distance)
-Add options to turn it off - DONE
-Add option to change symbol - DONE
-Add option to add custom symbol - DONE

@@ -1,13 +1,11 @@
 package com.explorer.locatordisplay.client;
 
-import com.terraformersmc.modmenu.api.ConfigScreenFactory;
-import com.terraformersmc.modmenu.api.ModMenuApi;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LocatorDisplayClient implements ClientModInitializer, ModMenuApi {
+public class LocatorDisplayClient implements ClientModInitializer {
 
 	public static final String MOD_ID = "locator-display";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -51,9 +49,4 @@ LOCATOR DISPLAY - a client-sided locator bar color display mod
 		LOGGER.info("\n\n{}", MOD_ART);
 	}
 
-	@SuppressWarnings("unused")
-	@Override
-	public ConfigScreenFactory<?> getModConfigScreenFactory() {
-		return LocatorDisplayConfigScreen::new;
-	}
 }
