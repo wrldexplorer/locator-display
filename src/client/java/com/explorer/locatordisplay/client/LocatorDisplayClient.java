@@ -40,9 +40,12 @@ LOCATOR DISPLAY - a client-sided locator bar color display mod
 
 	@Override
 	public void onInitializeClient() {
+		LocatorDisplayConfig.load(); //for modmenu
+
 		String username = MinecraftClient.getInstance().getSession().getUsername();
 		LOGGER.info("hihihi {}", username);
 		LOGGER.info("Locator Display mod initialized!");
+		LOGGER.info("Config enabled: {}", LocatorDisplayConfig.enabled);
 		LOGGER.info("\n{}", MOD_ART);
 	}
 }
