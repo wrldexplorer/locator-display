@@ -2,21 +2,29 @@
 	"schemaVersion": 1,
 	"id": "locator-display",
 	"version": "${version}",
+
 	"name": "Locator Display",
-	"description": "Just a client-sided locator bar color display mod!",
+	"description": "Just a client-sided locator bar color display mod",
 	"authors": [
 		"WRLDExplorer"
 	],
+
 	"contact": {
-		"homepage": "https://fabricmc.net/",
+		"homepage": "https://github.com/wrldexplorer/locator-display",
+		"issues": "https://github.com/wrldexplorer/locator-display/issues",
 		"sources": "https://github.com/wrldexplorer/locator-display"
 	},
+
 	"license": "GPL-3.0-only",
 	"icon": "assets/locator-display/icon.png",
+
 	"environment": "client",
 	"entrypoints": {
 		"client": [
 			"com.explorer.locatordisplay.client.LocatorDisplayClient"
+		],
+		"modmenu": [
+			"com.explorer.locatordisplay.client.LocatorDisplayModMenu"
 		]
 	},
 	"mixins": [
@@ -27,7 +35,22 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.19.3",
-		"minecraft": "~1.21.10",
+		"minecraft": ">1.21.8 <=1.21.11",
 		"java": ">=21"
+	},
+	"suggests": {
+		"modmenu": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.wiki": "https://github.com/wrldexplorer/locator-display/blob/main/README.md",
+				"modmenu.modrinth": "Waiting for MODRINTH TO APPROVE :/",
+				"modmenu.youtube": "https://www.youtube.com/@new_explorer",
+				"modmenu.patreon": "https://patreon.com/NewExplorer",
+				"modmenu.discord": "https://discord.gg/yKxhm55Z7"
+			},
+			"update_checker": true
+		}
 	}
 }
