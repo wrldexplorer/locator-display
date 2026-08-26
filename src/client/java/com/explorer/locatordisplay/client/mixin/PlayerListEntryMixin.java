@@ -1,12 +1,15 @@
 package com.explorer.locatordisplay.client.mixin;
 
 import com.explorer.locatordisplay.client.LocatorColorUtil;
+import com.explorer.locatordisplay.client.LocatorDisplayConfig;
 import com.explorer.locatordisplay.client.UuidResolver;
+
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,6 +37,10 @@ public abstract class PlayerListEntryMixin {
 
 	@Inject(method = "getDisplayName", at = @At("RETURN"), cancellable = true)
 	private void addLocatorColorDot(CallbackInfoReturnable<Text> cir) {
+		if (!LocatorDisplayConfig.enabled) {
+			return;
+		}
+
 		GameProfile profile = getProfile();
 		String playerName = profile.name();
 
@@ -65,6 +72,7 @@ public abstract class PlayerListEntryMixin {
 
 		if (loggedPlayerNames.add(playerName.toLowerCase())) {
 			LOGGER.info("Added locator dot for '{}' with UUID '{}'", playerName, uuid);
+			LOGGER.info("Calculated hex code is: #{}", String.format("%06X", rgbColor));
 		}
 
 		/**
@@ -76,11 +84,12 @@ public abstract class PlayerListEntryMixin {
 			originalName = Text.literal(playerName);
 		}
 
-		Text dotSymbol = Text.literal("● ")
+		String pickedSymbol = LocatorDisplayConfig.getCurrentSymbol() + " ";
+		Text nameSymbol = Text.literal(pickedSymbol)
 				.setStyle(Style.EMPTY.withColor(rgbColor));
 
 		MutableText modifiedName = Text.empty()
-				.append(dotSymbol)
+				.append(nameSymbol)
 				.append(originalName);
 
 		cir.setReturnValue(modifiedName);
