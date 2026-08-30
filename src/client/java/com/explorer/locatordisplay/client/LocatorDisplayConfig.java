@@ -17,6 +17,7 @@ public class LocatorDisplayConfig {
             FabricLoader.getInstance().getConfigDir().resolve("locator-display.properties");
 
     public static boolean enabled = true;
+    public static boolean onlineUUID = false;
     public static final String[] SYMBOLS = {"⬤", "▌", "⬛", "★", "◆", "▶", "✚", "✖", "Custom"};
     public static int symbolIndex = 0;
     public static String customSymbol = "";

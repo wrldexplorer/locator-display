@@ -43,35 +43,44 @@ public abstract class PlayerListEntryMixin {
 
 		GameProfile profile = getProfile();
 		String playerName = profile.name();
+		UUID playerUUID = profile.id();
 
 		// skip unnamed entries - npc? etc? whatever server have
 		if (playerName == null || playerName.isEmpty()) {
 			return;
 		}
 
-		// Yay, we get the Mojang UUID (async). If the future is not done yet, we wait. TODO:add a limit
-		CompletableFuture<UUID> uuidFuture = UuidResolver.getUuid(playerName);
-		UUID uuid = null;
+		/**
+		 * Optional method, by default the mod will get the player UUID locally
+		 * Otherwise, if specified, will connect to the mojang api
+		 * If that fails, will generate a temporary generated UUID(cracked players)
+		 */
+		if(LocatorDisplayConfig.onlineUUID){
+			LOGGER.info("Fetching UUID using the Mojang API.");
+			// Yay, we get the Mojang UUID (async). If the future is not done yet, we wait. TODO:add a limit
+			CompletableFuture<UUID> uuidFuture = UuidResolver.getUuid(playerName);
+			playerUUID = null;
 
-		if (uuidFuture.isDone()) {
-			uuid = uuidFuture.getNow(null);
-			if (uuid == null) {
-				// API returned null ~a.k.a~ player is not in Mojang database (cracked/offline)
-				// deterministic offline UUID so their color is stable
-				uuid = UUID.nameUUIDFromBytes(
-						("OfflinePlayer:" + playerName).getBytes(StandardCharsets.UTF_8)
-				);
+			if (uuidFuture.isDone()) {
+				playerUUID = uuidFuture.getNow(null);
+				if (playerUUID == null) {
+					// API returned null ~a.k.a~ player is not in Mojang database (cracked/offline)
+					// deterministic offline UUID so their color is stable
+					playerUUID = UUID.nameUUIDFromBytes(
+							("OfflinePlayer:" + playerName).getBytes(StandardCharsets.UTF_8)
+					);
+				}
+			} else {
+				// Future not complete yet -> no dot for this player (will appear later).
+				// TODO: sth happens here, some tracker that activates the limit (in the future ~ maybe)
+				return;
 			}
-		} else {
-			// Future not complete yet -> no dot for this player (will appear later).
-			// TODO: sth happens here, some tracker that activates the limit (in the future ~ maybe)
-			return;
 		}
 
-		int rgbColor = LocatorColorUtil.getColorFromUuid(uuid);
+		int rgbColor = LocatorColorUtil.getColorFromUuid(playerUUID);
 
 		if (loggedPlayerNames.add(playerName.toLowerCase())) {
-			LOGGER.info("Added locator dot for '{}' with UUID '{}'", playerName, uuid);
+			LOGGER.info("Added locator dot for '{}' with UUID '{}'", playerName, playerUUID);
 			LOGGER.info("Calculated hex code is: #{}", String.format("%06X", rgbColor));
 		}
 

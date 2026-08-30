@@ -36,6 +36,20 @@ public class LocatorDisplayConfigScreen extends Screen {
                 ).bounds(centerX, startY, 150, 20).build()
         );
 
+        // UUID fetching button
+        this.addRenderableWidget(
+                Button.builder(
+                        Component.literal("Fetch: " + (LocatorDisplayConfig.onlineUUID ? "Mojang API UUID" : "Local UUID")),
+                        button -> {
+                            LocatorDisplayConfig.onlineUUID = !LocatorDisplayConfig.onlineUUID;
+                            button.setMessage(
+                                    Component.literal("Fetch: " + (LocatorDisplayConfig.onlineUUID ? "Mojang API UUID" : "Local UUID"))
+                            );
+                            LocatorDisplayConfig.save();
+                        }
+                ).bounds(centerX, startY + spacing, 150, 20).build()
+        );
+
         // symbol customizer button
         this.addRenderableWidget(
                 Button.builder(
@@ -57,14 +71,14 @@ public class LocatorDisplayConfigScreen extends Screen {
 
                             LocatorDisplayConfig.save();
                         }
-                ).bounds(centerX, startY + spacing, 150, 20).build()
+                ).bounds(centerX, startY + (spacing * 2), 150, 20).build()
         );
 
         // custom symbol textbox
         this.customSymbolBox = new EditBox(
                 this.font,
                 centerX,
-                startY + (spacing * 2),
+                startY + (spacing * 3),
                 150,
                 20,
                 Component.literal("Custom Symbol")
@@ -88,7 +102,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                                 this.minecraft.gui.setScreen(this.parent);
                             }
                         }
-                ).bounds(centerX, startY + (spacing * 3) + 6, 150, 20).build()
+                ).bounds(centerX, startY + (spacing * 4) + 15, 150, 20).build()
         );
     }
 
