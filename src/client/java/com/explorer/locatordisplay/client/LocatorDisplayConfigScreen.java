@@ -20,6 +20,8 @@ public class LocatorDisplayConfigScreen extends Screen {
     protected void init() {
         int centerX = this.width / 2 - 75;
         int startY = this.height / 2 - 50;
+        int width = 180;
+        int height = 20;
         int spacing = 24;
 
         // toggle on/off button
@@ -33,21 +35,21 @@ public class LocatorDisplayConfigScreen extends Screen {
                             );
                             LocatorDisplayConfig.save();
                         }
-                ).bounds(centerX, startY, 150, 20).build()
+                ).bounds(centerX, startY, width, height).build()
         );
 
         // UUID fetching button
         this.addRenderableWidget(
                 Button.builder(
-                        Component.literal("Fetch: " + (LocatorDisplayConfig.onlineUUID ? "Mojang API UUID" : "Local UUID")),
+                        Component.literal("UUID Source: " + (LocatorDisplayConfig.onlineUUID ? "Official Mojang" : "Server-Provided")),
                         button -> {
                             LocatorDisplayConfig.onlineUUID = !LocatorDisplayConfig.onlineUUID;
                             button.setMessage(
-                                    Component.literal("Fetch: " + (LocatorDisplayConfig.onlineUUID ? "Mojang API UUID" : "Local UUID"))
+                                    Component.literal("UUID Source: " + (LocatorDisplayConfig.onlineUUID ? "Official Mojang" : "Server-Provided"))
                             );
                             LocatorDisplayConfig.save();
                         }
-                ).bounds(centerX, startY + spacing, 150, 20).build()
+                ).bounds(centerX, startY + spacing, width, height).build()
         );
 
         // symbol customizer button
@@ -57,6 +59,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                         button -> {
                             LocatorDisplayConfig.symbolIndex = (LocatorDisplayConfig.symbolIndex + 1) % LocatorDisplayConfig.SYMBOLS.length;
 
+                            boolean minecraftActive = LocatorDisplayConfig.isMinecraftSelected();
                             boolean customActive = LocatorDisplayConfig.isCustomSelected();
 
                             button.setMessage(
@@ -71,7 +74,7 @@ public class LocatorDisplayConfigScreen extends Screen {
 
                             LocatorDisplayConfig.save();
                         }
-                ).bounds(centerX, startY + (spacing * 2), 150, 20).build()
+                ).bounds(centerX, startY + (spacing * 2), width, height).build()
         );
 
         // custom symbol textbox
@@ -79,8 +82,8 @@ public class LocatorDisplayConfigScreen extends Screen {
                 this.font,
                 centerX,
                 startY + (spacing * 3),
-                150,
-                20,
+                width,
+                height,
                 Component.literal("Custom Symbol")
         );
         this.customSymbolBox.setHint(Component.literal("> Custom (max length 3)"));
@@ -102,7 +105,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                                 this.minecraft.gui.setScreen(this.parent);
                             }
                         }
-                ).bounds(centerX, startY + (spacing * 4) + 15, 150, 20).build()
+                ).bounds(centerX, startY + (spacing * 4) + 15, width, height).build()
         );
     }
 

@@ -51,7 +51,7 @@ public abstract class PlayerListEntryMixin {
 		}
 
 		/**
-		 * Optional method, by default the mod will get the player UUID locally
+		 * Optional method, by default the mod will get the player UUID from the seesion/server
 		 * Otherwise, if specified, will connect to the mojang api
 		 * If that fails, will generate a temporary generated UUID(cracked players)
 		 */
@@ -59,21 +59,17 @@ public abstract class PlayerListEntryMixin {
 			LOGGER.info("Fetching UUID using the Mojang API.");
 			// Yay, we get the Mojang UUID (async). If the future is not done yet, we wait. TODO:add a limit
 			CompletableFuture<UUID> uuidFuture = UuidResolver.getUuid(playerName);
-			playerUUID = null;
 
 			if (uuidFuture.isDone()) {
 				playerUUID = uuidFuture.getNow(null);
 				if (playerUUID == null) {
 					// API returned null ~a.k.a~ player is not in Mojang database (cracked/offline)
+					// or the server has not responded
 					// deterministic offline UUID so their color is stable
 					playerUUID = UUID.nameUUIDFromBytes(
 							("OfflinePlayer:" + playerName).getBytes(StandardCharsets.UTF_8)
 					);
 				}
-			} else {
-				// Future not complete yet -> no dot for this player (will appear later).
-				// TODO: sth happens here, some tracker that activates the limit (in the future ~ maybe)
-				return;
 			}
 		}
 

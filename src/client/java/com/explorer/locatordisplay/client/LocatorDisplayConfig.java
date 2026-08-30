@@ -18,9 +18,12 @@ public class LocatorDisplayConfig {
 
     public static boolean enabled = true;
     public static boolean onlineUUID = false;
-    public static final String[] SYMBOLS = {"⬤", "▌", "⬛", "★", "◆", "▶", "✚", "✖", "Custom"};
+    public static final String[] SYMBOLS = {"Minecraft", "⬤", "▌", "⬛", "★", "◆", "▶", "✚", "✖", "Custom"};
     public static int symbolIndex = 0;
     public static String customSymbol = "";
+    public static boolean isMinecraftSelected() {
+        return symbolIndex >= 0 && symbolIndex < SYMBOLS.length && SYMBOLS[symbolIndex].equals("Minecraft");
+    }
     public static boolean isCustomSelected() {
         return symbolIndex >= 0 && symbolIndex < SYMBOLS.length && SYMBOLS[symbolIndex].equals("Custom");
     }
