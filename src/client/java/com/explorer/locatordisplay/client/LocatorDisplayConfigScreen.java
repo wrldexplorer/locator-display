@@ -9,7 +9,7 @@ import org.jspecify.annotations.NonNull;
 
 public class LocatorDisplayConfigScreen extends Screen {
     private final Screen parent;
-    private EditBox customSymbolBox;
+    private EditBox customBox;
 
     public LocatorDisplayConfigScreen(Screen parent) {
         super(Component.literal("Locator Display Config"));
@@ -52,49 +52,90 @@ public class LocatorDisplayConfigScreen extends Screen {
                 ).bounds(centerX, startY + spacing, width, height).build()
         );
 
-        // symbol customizer button
+        // icon type button
         this.addRenderableWidget(
                 Button.builder(
-                        Component.literal("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.symbolIndex]),
+                        Component.literal("Icon Type: " + (LocatorDisplayConfig.imageIcon ? "Texture" : "Symbol")),
                         button -> {
-                            LocatorDisplayConfig.symbolIndex = (LocatorDisplayConfig.symbolIndex + 1) % LocatorDisplayConfig.SYMBOLS.length;
-
-                            boolean minecraftActive = LocatorDisplayConfig.isMinecraftSelected();
-                            boolean customActive = LocatorDisplayConfig.isCustomSelected();
-
+                            LocatorDisplayConfig.imageIcon = !LocatorDisplayConfig.imageIcon;
+                            LocatorDisplayConfig.selectIndex = 0;
                             button.setMessage(
-                                    Component.literal("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.symbolIndex])
+                                    Component.literal("Icon Type: " + (LocatorDisplayConfig.imageIcon ? "Texture" : "Symbol"))
                             );
-
-                            // Enable/disable text box interaction depending on selection
-                            customSymbolBox.setEditable(customActive);
-                            if (!customActive) {
-                                customSymbolBox.setFocused(false);
-                            }
-
                             LocatorDisplayConfig.save();
                         }
                 ).bounds(centerX, startY + (spacing * 2), width, height).build()
         );
 
-        // custom symbol textbox
-        this.customSymbolBox = new EditBox(
+        // symbol customizer button
+        this.addRenderableWidget(
+                Button.builder(
+                        Component.literal(LocatorDisplayConfig.imageIcon
+                                        ? ("Icon: "  + LocatorDisplayConfig.ICONS[LocatorDisplayConfig.selectIndex])
+                                        : ("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.selectIndex])
+                        ),
+                        button -> {
+                            LocatorDisplayConfig.selectIndex = (LocatorDisplayConfig.selectIndex + 1)
+                                                % (LocatorDisplayConfig.imageIcon
+                                                        ? LocatorDisplayConfig.ICONS.length
+                                                        : LocatorDisplayConfig.SYMBOLS.length
+                                                )
+                            ;
+
+                            boolean customActive = LocatorDisplayConfig.isCustomSelected();
+
+                            button.setMessage(
+                                    Component.literal(LocatorDisplayConfig.imageIcon
+                                            ? ("Icon: "  + LocatorDisplayConfig.ICONS[LocatorDisplayConfig.selectIndex])
+                                            : ("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.selectIndex])
+                                    )
+                            );
+
+                            // Enables/disables text box interaction depending on selection
+                            customBox.setEditable(customActive);
+                            if (!customActive) {
+                                customBox.setFocused(false);
+                            }
+
+                            LocatorDisplayConfig.save();
+                        }
+                ).bounds(centerX, startY + (spacing * 3), width, height).build()
+        );
+
+        // custom symbol/icon textbox
+        this.customBox = new EditBox(
                 this.font,
                 centerX,
-                startY + (spacing * 3),
+                startY + (spacing * 4),
                 width,
                 height,
-                Component.literal("Custom Symbol")
+                Component.literal("Custom")
         );
-        this.customSymbolBox.setHint(Component.literal("> Custom (max length 3)"));
-        this.customSymbolBox.setValue(LocatorDisplayConfig.customSymbol);
-        this.customSymbolBox.setEditable(LocatorDisplayConfig.isCustomSelected());
-        this.customSymbolBox.setResponder(text -> {
-            if (!text.isEmpty() && text.length() <= 3) LocatorDisplayConfig.customSymbol = text; //max char 3
-            else                   LocatorDisplayConfig.customSymbol = "⬤";
-            LocatorDisplayConfig.save();
-        });
-        this.addRenderableWidget(this.customSymbolBox);
+        this.customBox.setHint(
+                Component.literal(
+                    LocatorDisplayConfig.imageIcon
+                            ? "> Custom texture PATH"
+                            : "> Custom (max length 3)"
+                )
+        );
+        this.customBox.setEditable(LocatorDisplayConfig.isCustomSelected());
+
+        if (!LocatorDisplayConfig.imageIcon){
+            this.customBox.setValue(LocatorDisplayConfig.customSymbol);
+            this.customBox.setResponder(text -> {
+                if (!text.isEmpty() && text.length() <= 3) LocatorDisplayConfig.customSymbol = text; //max char 3
+                else LocatorDisplayConfig.customSymbol = "⬤";
+                LocatorDisplayConfig.save();
+            });
+        } else {
+            this.customBox.setValue(LocatorDisplayConfig.customDir);
+            this.customBox.setResponder(text -> {
+                if (!text.isEmpty()) LocatorDisplayConfig.customDir = text;
+                else LocatorDisplayConfig.customDir = "";
+                LocatorDisplayConfig.save();
+            });
+        }
+        this.addRenderableWidget(this.customBox);
 
         // done button
         this.addRenderableWidget(
@@ -105,7 +146,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                                 this.minecraft.gui.setScreen(this.parent);
                             }
                         }
-                ).bounds(centerX, startY + (spacing * 4) + 15, width, height).build()
+                ).bounds(centerX, startY + (spacing * 5) + 15, width, height).build()
         );
     }
 

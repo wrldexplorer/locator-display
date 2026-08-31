@@ -10,16 +10,21 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.Component;
 
+import net.minecraft.network.chat.contents.ObjectContents;
+import net.minecraft.network.chat.contents.objects.ObjectInfo;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -27,10 +32,12 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(PlayerInfo.class)
 public abstract class PlayerListEntryMixin {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger("LocatorDisplay");
+	@Unique
+    private static final Logger LOGGER = LoggerFactory.getLogger("LocatorDisplay");
 
-	// to track which player names have already been logged (to avoid console spam | what oop does to a man ^=^)
-	private static final Set<String> loggedPlayerNames = new HashSet<>();
+	// to track which player names have already been logged
+	@Unique
+    private static final Set<String> loggedPlayerNames = new HashSet<>();
 
 	@Shadow
 	public abstract GameProfile getProfile();
@@ -89,14 +96,16 @@ public abstract class PlayerListEntryMixin {
 			originalName = Component.literal(playerName);
 		}
 
-		String pickedSymbol = LocatorDisplayConfig.getCurrentSymbol() + " ";
-		Component nameSymbol = Component.literal(pickedSymbol)
-				.setStyle(Style.EMPTY.withColor(rgbColor));
+		if (!LocatorDisplayConfig.imageIcon) {
+			String pickedSymbol = LocatorDisplayConfig.getCurrentSelection() + " ";
+			Component prefixComponent = Component.literal(pickedSymbol)
+					.setStyle(Style.EMPTY.withColor(rgbColor));
 
-		MutableComponent modifiedName = Component.empty()
-				.append(nameSymbol)
-				.append(originalName);
+			MutableComponent modifiedName = Component.empty()
+					.append(prefixComponent)
+					.append(originalName);
 
-		cir.setReturnValue(modifiedName);
+			cir.setReturnValue(modifiedName);
+		}
 	}
 }

@@ -3,7 +3,8 @@
 	"package": "com.explorer.locatordisplay.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"PlayerListEntryMixin"
+		"PlayerListEntryMixin",
+		"TabMenuOverlayMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
