@@ -47,24 +47,94 @@ public class LocatorDisplayConfig {
         return activeArray[selectIndex];
     }
 
+    public static final Identifier DEFAULT_ICON = Identifier.withDefaultNamespace("hud/locator_bar_dot/default_0");
     public static Identifier getSelectedIconIdentifier() {
 
         if (isCustomSelected()) {
             if (customDir == null || customDir.isBlank()) {
-                return null;
+                return DEFAULT_ICON;
             }
-            return Identifier.parse(customDir);
+            return resolveCustomIdentifier(customDir.trim());
         }
 
         String selection = getCurrentSelection();
         return switch (selection) {
-            case "Near" -> Identifier.withDefaultNamespace("hud/locator_bar_dot/default_0");
             case "Nearby" -> Identifier.withDefaultNamespace("hud/locator_bar_dot/default_1");
             case "Far" -> Identifier.withDefaultNamespace("hud/locator_bar_dot/default_2");
             case "Distant" -> Identifier.withDefaultNamespace("hud/locator_bar_dot/default_3");
             case "Bowtie" -> Identifier.withDefaultNamespace("hud/locator_bar_dot/bowtie");
-            default -> Identifier.withDefaultNamespace("");
+            default -> DEFAULT_ICON;
         };
+    }
+
+    //mc 26.2 dirs @assets/textures/
+    private static boolean isStandardTextureDir(String path) {
+        String[] dirs = {
+                "block", "colormap", "effect", "entity", "environment",
+                "font", "gui", "item", "map", "misc", "mob_effect",
+                "painting", "particle", "trims"
+        };
+        for (String dir : dirs) {
+            if (path.startsWith(dir + "/")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Identifier resolveCustomIdentifier(String pathInput) {
+        if (pathInput == null || pathInput.isBlank()) {
+            LOGGER.info("[LocatorDisplay] Invalid/Empty input detected, defaulting");
+            return DEFAULT_ICON;
+        }
+
+        pathInput = pathInput.trim();
+        String cleaned = pathInput.replace('\\', '/');
+        //default fallbacks
+        String namespace = "minecraft";
+        String path = cleaned;
+
+        // Extract namespace "modid:block/custom_block" or "minecraft:block/dirt"
+        if (cleaned.contains(":")) {
+            LOGGER.info("[LocatorDisplay] {} contains ':'", cleaned);
+            String[] split = cleaned.split(":", 2);
+            namespace = split[0].trim();
+            path = split[1].trim();
+        }
+
+        //no longer needed ~ i think
+        //i alr check it later and return default
+        if (!Identifier.isValidNamespace(namespace)) {
+            LOGGER.info("[LocatorDisplay] Invalid namespace {}, defaulting to 'minecraft'", namespace);
+            namespace = "minecraft";
+        }
+
+        // Strip leading slash
+        if (path.startsWith("/")) {
+            LOGGER.info("[LocatorDisplay] {} starts with '/', stripping", path);
+            path = path.substring(1);
+        }
+
+        if (isStandardTextureDir(path) && !path.startsWith("textures/")) {
+            LOGGER.info("[LocatorDisplay] standard path doesnt start with 'textures/'");
+            path = "textures/" + path;
+        }
+
+        if (path.startsWith("textures/") && !path.endsWith(".png")) {
+            LOGGER.info("[LocatorDisplay] path doesnt end with 'png'");
+            path = path + ".png";
+        }
+        //identifier doesnt seem to like capital letters
+        path = path.toLowerCase();
+
+        // Final safety check to completely prevent IdentifierException crashes
+        if (!Identifier.isValidNamespace(namespace) || !Identifier.isValidPath(path)) {
+            LOGGER.error("[LocatorDisplay] Invalid custom icon identifier characters: {}:{}", namespace, path);
+            return DEFAULT_ICON;
+        }
+
+        LOGGER.info("[LocatorDisplay] Returning identifier with namespace:'{}', and path:'{}'", namespace, path);
+        return Identifier.fromNamespaceAndPath(namespace, path);
     }
 
     public static void load() {

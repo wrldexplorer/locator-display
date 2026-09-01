@@ -49,31 +49,49 @@ public class TabMenuOverlayMixin {
             @Local PlayerInfo playerEntry,
             @Local(name = "xo") int contentXOffset,
             @Local(name = "yo") int contentYOffset,
-            @Local(name = "showHead") boolean isRenderingHead
+            @Local(name = "showHead") boolean isRenderingHead //clean up needed
     ) {
         if (!LocatorDisplayConfig.enabled || !LocatorDisplayConfig.imageIcon) {
             return;
         }
 
         Identifier iconIdentifier = LocatorDisplayConfig.getSelectedIconIdentifier();
-        if (iconIdentifier == null || iconIdentifier.getPath().isEmpty()) {
-            return;
-        }
+        if (iconIdentifier == null || iconIdentifier.getPath().isEmpty()) return;
 
         // if player head is rendering, place the icon right after it @9px offset
-        int slotLeftX = contentXOffset;
         int rgbColor = LocatorColorUtil.getColorFromUuid(playerEntry.getProfile().id());
         int iconColorTint = 0xFF000000 | (rgbColor & 0x00FFFFFF);
 
-        graphics.blitSprite(
-                RenderPipelines.GUI_TEXTURED,
-                iconIdentifier,
-                slotLeftX,
-                contentYOffset,
-                LocatorDisplayTabLayout.ICON_SIZE,
-                LocatorDisplayTabLayout.ICON_SIZE,
-                iconColorTint
-        );
+        String path = iconIdentifier.getPath();
+        if (path.startsWith("hud/")) {
+            // Built-in HUD Sprites (from sprite atlas)
+            graphics.blitSprite(
+                    RenderPipelines.GUI_TEXTURED,
+                    iconIdentifier,
+                    contentXOffset,
+                    contentYOffset,
+                    LocatorDisplayTabLayout.ICON_SIZE,
+                    LocatorDisplayTabLayout.ICON_SIZE,
+                    iconColorTint
+            );
+        } else {
+            // Standard Textures in live instance/active mods (blit)
+            // U and V offsets are 0, texture dimensions == icon size
+            // should scale specified texture to the 8x8
+            graphics.blit(
+                    RenderPipelines.GUI_TEXTURED,
+                    iconIdentifier,
+                    contentXOffset,
+                    contentYOffset,
+                    0.0f, // uOffset
+                    0.0f, // vOffset
+                    LocatorDisplayTabLayout.ICON_SIZE,
+                    LocatorDisplayTabLayout.ICON_SIZE,
+                    LocatorDisplayTabLayout.ICON_SIZE, // textureWidth
+                    LocatorDisplayTabLayout.ICON_SIZE, // textureHeight
+                    iconColorTint
+            );
+        }
     }
 
     // push player name text to the right of the custom icon slot
