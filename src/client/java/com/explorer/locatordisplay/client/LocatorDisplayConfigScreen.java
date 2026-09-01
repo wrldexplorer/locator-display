@@ -111,6 +111,9 @@ public class LocatorDisplayConfigScreen extends Screen {
                 height,
                 Component.literal("Custom")
         );
+        if (LocatorDisplayConfig.imageIcon){
+            this.customBox.setMaxLength(256);
+        }
         this.customBox.setHint(
                 Component.literal(
                     LocatorDisplayConfig.imageIcon
