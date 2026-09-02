@@ -48,8 +48,7 @@ public class TabMenuOverlayMixin {
             CallbackInfo ci,
             @Local PlayerInfo playerEntry,
             @Local(name = "xo") int contentXOffset,
-            @Local(name = "yo") int contentYOffset,
-            @Local(name = "showHead") boolean isRenderingHead //clean up needed
+            @Local(name = "yo") int contentYOffset
     ) {
         if (!LocatorDisplayConfig.enabled || !LocatorDisplayConfig.imageIcon) {
             return;

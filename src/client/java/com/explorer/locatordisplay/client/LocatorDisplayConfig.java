@@ -41,7 +41,7 @@ public class LocatorDisplayConfig {
         }
 
         if (isCustomSelected()) {
-            return (LocatorDisplayConfig.imageIcon ? customDir : customSymbol);
+            return (imageIcon ? customDir : customSymbol);
         }
 
         return activeArray[selectIndex];
@@ -54,7 +54,7 @@ public class LocatorDisplayConfig {
             if (customDir == null || customDir.isBlank()) {
                 return DEFAULT_ICON;
             }
-            return resolveCustomIdentifier(customDir.trim());
+            return resolveCustomIdentifier(customDir);
         }
 
         String selection = getCurrentSelection();
@@ -102,13 +102,6 @@ public class LocatorDisplayConfig {
             path = split[1].trim();
         }
 
-        //no longer needed ~ i think
-        //i alr check it later and return default
-        if (!Identifier.isValidNamespace(namespace)) {
-            LOGGER.info("[LocatorDisplay] Invalid namespace {}, defaulting to 'minecraft'", namespace);
-            namespace = "minecraft";
-        }
-
         // Strip leading slash
         if (path.startsWith("/")) {
             LOGGER.info("[LocatorDisplay] {} starts with '/', stripping", path);
@@ -124,7 +117,6 @@ public class LocatorDisplayConfig {
             LOGGER.info("[LocatorDisplay] path doesnt end with 'png'");
             path = path + ".png";
         }
-        //identifier doesnt seem to like capital letters
         path = path.toLowerCase();
 
         // Final safety check to completely prevent IdentifierException crashes
