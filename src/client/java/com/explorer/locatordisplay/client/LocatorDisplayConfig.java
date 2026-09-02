@@ -30,6 +30,27 @@ public class LocatorDisplayConfig {
     //select index for either
     public static int selectIndex = 0;
 
+    //sets settings to defaults if player messed them up
+    public static void resetToDefaults() {
+        enabled = true;
+        onlineUUID = false;
+        imageIcon = true;
+        selectIndex = 0;
+        customDir = "";
+        customSymbol = "";
+        save();
+    }
+
+    //check if alr defaults
+    public static boolean isDefault() {
+        return enabled
+            && !onlineUUID
+            && imageIcon
+            && selectIndex == 0
+            && (customDir == null || customDir.isEmpty())
+            && (customSymbol == null || customSymbol.isEmpty());
+    }
+
     public static boolean isCustomSelected() {
         String[] activeArray = imageIcon ? ICONS : SYMBOLS;
         return selectIndex >= 0 && selectIndex < activeArray.length && activeArray[selectIndex].equals("Custom");

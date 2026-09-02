@@ -9,7 +9,12 @@ import org.jspecify.annotations.NonNull;
 
 public class LocatorDisplayConfigScreen extends Screen {
     private final Screen parent;
+    private Button enabledButton;
+    private Button uuidSourceButton;
+    private Button iconTypeButton;
+    private Button symbolButton;
     private EditBox customBox;
+    private Button defaultsButton;
 
     public LocatorDisplayConfigScreen(Screen parent) {
         super(Component.literal("Locator Display Config"));
@@ -25,132 +30,125 @@ public class LocatorDisplayConfigScreen extends Screen {
         int spacing = 24;
 
         // toggle on/off button
-        this.addRenderableWidget(
-                Button.builder(
-                        Component.literal("Enabled: " + (LocatorDisplayConfig.enabled ? "ON" : "OFF")),
-                        button -> {
-                            LocatorDisplayConfig.enabled = !LocatorDisplayConfig.enabled;
-                            button.setMessage(
-                                    Component.literal("Enabled: " + (LocatorDisplayConfig.enabled ? "ON" : "OFF"))
-                            );
-                            LocatorDisplayConfig.save();
-                        }
-                ).bounds(centerX, startY, width, height).build()
+        this.enabledButton = this.addRenderableWidget(
+                Button.builder(Component.empty(), button -> {
+                    LocatorDisplayConfig.enabled = !LocatorDisplayConfig.enabled;
+                    LocatorDisplayConfig.save();
+                    this.updateWidgetStates(); // refreshes the buttons
+                }).bounds(centerX, startY, width, height).build()
         );
 
         // UUID fetching button
-        this.addRenderableWidget(
-                Button.builder(
-                        Component.literal("UUID Source: " + (LocatorDisplayConfig.onlineUUID ? "Official Mojang" : "Server-Provided")),
-                        button -> {
-                            LocatorDisplayConfig.onlineUUID = !LocatorDisplayConfig.onlineUUID;
-                            button.setMessage(
-                                    Component.literal("UUID Source: " + (LocatorDisplayConfig.onlineUUID ? "Official Mojang" : "Server-Provided"))
-                            );
-                            LocatorDisplayConfig.save();
-                        }
-                ).bounds(centerX, startY + spacing, width, height).build()
+        this.uuidSourceButton = this.addRenderableWidget(
+                Button.builder(Component.empty(), button -> {
+                    LocatorDisplayConfig.onlineUUID = !LocatorDisplayConfig.onlineUUID;
+                    LocatorDisplayConfig.save();
+                    this.updateWidgetStates();
+                }).bounds(centerX, startY + spacing, width, height).build()
         );
 
         // icon type button
-        this.addRenderableWidget(
-                Button.builder(
-                        Component.literal("Icon Type: " + (LocatorDisplayConfig.imageIcon ? "Texture" : "Symbol")),
-                        button -> {
-                            LocatorDisplayConfig.imageIcon = !LocatorDisplayConfig.imageIcon;
-                            LocatorDisplayConfig.selectIndex = 0;
-                            button.setMessage(
-                                    Component.literal("Icon Type: " + (LocatorDisplayConfig.imageIcon ? "Texture" : "Symbol"))
-                            );
-                            LocatorDisplayConfig.save();
-                        }
-                ).bounds(centerX, startY + (spacing * 2), width, height).build()
+        this.iconTypeButton = this.addRenderableWidget(
+                Button.builder(Component.empty(), button -> {
+                    LocatorDisplayConfig.imageIcon = !LocatorDisplayConfig.imageIcon;
+                    LocatorDisplayConfig.selectIndex = 0;
+                    LocatorDisplayConfig.save();
+                    this.updateWidgetStates();
+                }).bounds(centerX, startY + (spacing * 2), width, height).build()
         );
 
         // symbol customizer button
-        this.addRenderableWidget(
-                Button.builder(
-                        Component.literal(LocatorDisplayConfig.imageIcon
-                                        ? ("Icon: "  + LocatorDisplayConfig.ICONS[LocatorDisplayConfig.selectIndex])
-                                        : ("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.selectIndex])
-                        ),
-                        button -> {
-                            LocatorDisplayConfig.selectIndex = (LocatorDisplayConfig.selectIndex + 1)
-                                                % (LocatorDisplayConfig.imageIcon
-                                                        ? LocatorDisplayConfig.ICONS.length
-                                                        : LocatorDisplayConfig.SYMBOLS.length
-                                                )
-                            ;
-
-                            boolean customActive = LocatorDisplayConfig.isCustomSelected();
-
-                            button.setMessage(
-                                    Component.literal(LocatorDisplayConfig.imageIcon
-                                            ? ("Icon: "  + LocatorDisplayConfig.ICONS[LocatorDisplayConfig.selectIndex])
-                                            : ("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.selectIndex])
-                                    )
-                            );
-
-                            // Enables/disables text box interaction depending on selection
-                            customBox.setEditable(customActive);
-                            if (!customActive) {
-                                customBox.setFocused(false);
-                            }
-
-                            LocatorDisplayConfig.save();
-                        }
-                ).bounds(centerX, startY + (spacing * 3), width, height).build()
+        this.symbolButton = this.addRenderableWidget(
+                Button.builder(Component.empty(), button -> {
+                    LocatorDisplayConfig.selectIndex = (LocatorDisplayConfig.selectIndex + 1)
+                            % (LocatorDisplayConfig.imageIcon
+                            ? LocatorDisplayConfig.ICONS.length
+                            : LocatorDisplayConfig.SYMBOLS.length);
+                    LocatorDisplayConfig.save();
+                    this.updateWidgetStates();
+                }).bounds(centerX, startY + (spacing * 3), width, height).build()
         );
 
         // custom symbol/icon textbox
-        this.customBox = new EditBox(
-                this.font,
-                centerX,
-                startY + (spacing * 4),
-                width,
-                height,
-                Component.literal("Custom")
-        );
-        if (LocatorDisplayConfig.imageIcon){
-            this.customBox.setMaxLength(256);
-        }
-        this.customBox.setHint(
-                Component.literal(
-                    LocatorDisplayConfig.imageIcon
-                            ? "> Custom texture PATH"
-                            : "> Custom (max length 3)"
-                )
-        );
-        this.customBox.setEditable(LocatorDisplayConfig.isCustomSelected());
-
-        if (!LocatorDisplayConfig.imageIcon){
-            this.customBox.setValue(LocatorDisplayConfig.customSymbol);
-            this.customBox.setResponder(text -> {
-                if (!text.isEmpty() && text.length() <= 3) LocatorDisplayConfig.customSymbol = text; //max char 3
-                else LocatorDisplayConfig.customSymbol = "⬤";
-                LocatorDisplayConfig.save();
-            });
-        } else {
-            this.customBox.setValue(LocatorDisplayConfig.customDir);
-            this.customBox.setResponder(text -> {
-                if (!text.isEmpty()) LocatorDisplayConfig.customDir = text;
-                else LocatorDisplayConfig.customDir = "";
-                LocatorDisplayConfig.save();
-            });
-        }
+        this.customBox = new EditBox(this.font, centerX, startY + (spacing * 4), width, height, Component.literal("Custom"));
         this.addRenderableWidget(this.customBox);
+
+        // splitting bottom area for defaults & done buttons to be side-by-side
+        int halfWidth = (width - 4) / 2; // 88px each w/ 4px gap
+
+        // defaults button
+        this.defaultsButton = this.addRenderableWidget(
+                Button.builder(Component.literal("Defaults"), button -> {
+                    LocatorDisplayConfig.resetToDefaults();
+                    this.updateWidgetStates();
+                }).bounds(centerX, startY + (spacing * 5) + 15, halfWidth, height).build()
+        );
 
         // done button
         this.addRenderableWidget(
-                Button.builder(
-                        Component.literal("Done"),
-                        button -> {
-                            if (this.minecraft != null) {
-                                this.minecraft.gui.setScreen(this.parent);
-                            }
-                        }
-                ).bounds(centerX, startY + (spacing * 5) + 15, width, height).build()
+                Button.builder(Component.literal("Done"), button -> {
+                    if (this.minecraft != null) {
+                        this.minecraft.gui.setScreen(this.parent);
+                    }
+                }).bounds(centerX + halfWidth + 4, startY + (spacing * 5) + 15, halfWidth, height).build()
         );
+
+        this.updateWidgetStates(); // updates/refreshes the contents when a change occurs
+    }
+
+    /**
+     * Experimenting with a single source of truth to update every label,
+     * state, and interaction rule based on the configuration
+     * so the UI feels more interactive
+     * (less static and buggy)
+     */
+    private void updateWidgetStates() {
+        boolean isLocatorEnabled = LocatorDisplayConfig.enabled;
+
+        this.enabledButton.setMessage(Component.literal("Enabled: " + (isLocatorEnabled ? "ON" : "OFF")));
+        this.uuidSourceButton.setMessage(Component.literal(
+                "UUID Source: " + (LocatorDisplayConfig.onlineUUID ? "Official Mojang" : "Server-Provided")
+        ));
+        this.iconTypeButton.setMessage(Component.literal(
+                "Icon Type: " + (LocatorDisplayConfig.imageIcon ? "Texture" : "Symbol")
+        ));
+
+        this.symbolButton.setMessage(Component.literal(LocatorDisplayConfig.imageIcon
+                ? ("Icon: "  + LocatorDisplayConfig.ICONS[LocatorDisplayConfig.selectIndex])
+                : ("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.selectIndex])
+        ));
+
+        this.uuidSourceButton.active = this.iconTypeButton.active = this.symbolButton.active = isLocatorEnabled;
+
+        boolean customActive = isLocatorEnabled && LocatorDisplayConfig.isCustomSelected();
+
+        this.customBox.setEditable(customActive);
+        this.customBox.active = customActive;
+        if (!customActive) {
+            this.customBox.setFocused(false);
+        }
+        this.customBox.setResponder(text -> {});
+
+        if (LocatorDisplayConfig.imageIcon) {
+            this.customBox.setMaxLength(256);
+            this.customBox.setHint(Component.literal("> Custom texture PATH"));
+            this.customBox.setValue(LocatorDisplayConfig.customDir == null ? "" : LocatorDisplayConfig.customDir);
+        } else {
+            this.customBox.setMaxLength(3);
+            this.customBox.setHint(Component.literal("> Custom (max length 3)"));
+            this.customBox.setValue(LocatorDisplayConfig.customSymbol == null ? "" : LocatorDisplayConfig.customSymbol);
+        }
+
+        this.customBox.setResponder(text -> {
+            if (LocatorDisplayConfig.imageIcon) {
+                LocatorDisplayConfig.customDir = text.isEmpty() ? "" : text;
+            } else {
+                LocatorDisplayConfig.customSymbol = (!text.isEmpty() && text.length() <= 3) ? text : "⬤";
+            }
+            LocatorDisplayConfig.save();
+        });
+
+        this.defaultsButton.active = !LocatorDisplayConfig.isDefault();
     }
 
     @Override
