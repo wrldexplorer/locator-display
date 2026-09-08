@@ -54,7 +54,18 @@ public class TabMenuOverlayMixin {
             return;
         }
 
-        Identifier iconIdentifier = LocatorDisplayConfig.getSelectedIconIdentifier();
+        Identifier iconIdentifier;
+
+        boolean useProximity = LocatorDisplayConfig.proximity
+                && !LocatorDisplayConfig.isCustomSelected()
+                && !LocatorDisplayConfig.getCurrentSelection().equals("Bowtie");
+
+        if (useProximity) {
+            iconIdentifier = LocatorDisplayConfig.getProximityIcon(playerEntry.getProfile().id());
+        } else {
+            iconIdentifier = LocatorDisplayConfig.getSelectedIconIdentifier();
+        }
+
         if (iconIdentifier == null || iconIdentifier.getPath().isEmpty()) return;
 
         // if player head is rendering, place the icon right after it @9px offset

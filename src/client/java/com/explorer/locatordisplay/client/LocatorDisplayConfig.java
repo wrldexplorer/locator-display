@@ -1,7 +1,11 @@
 package com.explorer.locatordisplay.client;
 
+import com.explorer.locatordisplay.client.mixin.ClientWaypointManagerAccessor;
+import com.mojang.datafixers.util.Either;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.waypoints.ClientWaypointManager;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.waypoints.TrackedWaypoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +14,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
+import java.util.UUID;
 
 public class LocatorDisplayConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger("LocatorDisplay");
@@ -20,6 +27,7 @@ public class LocatorDisplayConfig {
     public static boolean enabled = true;
     public static boolean onlineUUID = false;
     public static boolean imageIcon = true;
+    public static boolean proximity = false;
 
     // icon
     public static final String[] ICONS = {"Near", "Nearby", "Far", "Distant", "Bowtie", "Custom"};
@@ -86,6 +94,37 @@ public class LocatorDisplayConfig {
             case "Bowtie" -> Identifier.withDefaultNamespace("hud/locator_bar_dot/bowtie");
             default -> DEFAULT_ICON;
         };
+    }
+
+    // helper method to calculate distance and return the correct icon for proximity detection
+    public static Identifier getProximityIcon(UUID playerId) {
+        net.minecraft.client.Minecraft minecraftClient = net.minecraft.client.Minecraft.getInstance();
+        if (minecraftClient.player == null) return DEFAULT_ICON;
+
+        ClientWaypointManager manager = Objects.requireNonNull(minecraftClient.getConnection()).getWaypointManager();
+        if (manager == null) return DEFAULT_ICON;
+
+        // from mc waypoint calc
+        Map<Either<UUID, String>, TrackedWaypoint> waypoints =
+                ((ClientWaypointManagerAccessor) manager).getWaypoints();
+
+        TrackedWaypoint targetPlayerWaypoint = waypoints.get(Either.left(playerId));
+        if (targetPlayerWaypoint != null) {
+            double squaredDistanceBlocks = targetPlayerWaypoint.distanceSquared(minecraftClient.player);
+            //hardcoded values bc I couldn't find what mojang uses (yet)
+            if (squaredDistanceBlocks < 115 * 115) {
+                return Identifier.withDefaultNamespace("hud/locator_bar_dot/default_0"); // Near
+            } else if (squaredDistanceBlocks < 235 * 235) {
+                return Identifier.withDefaultNamespace("hud/locator_bar_dot/default_1"); // Nearby
+            } else if (squaredDistanceBlocks < 335 * 335) {
+                return Identifier.withDefaultNamespace("hud/locator_bar_dot/default_2"); // Far
+            } else {
+                return Identifier.withDefaultNamespace("hud/locator_bar_dot/default_3"); // Distant
+            }
+        }
+        // didnt work as intended
+        // return Identifier.withDefaultNamespace("hud/locator_bar_dot/bowtie"); //diff dimension? instead of default
+        return DEFAULT_ICON;
     }
 
     //mc 26.2 dirs @assets/textures/
@@ -158,6 +197,7 @@ public class LocatorDisplayConfig {
                 enabled = Boolean.parseBoolean(props.getProperty("enabled", "true"));
                 onlineUUID = Boolean.parseBoolean(props.getProperty("onlineUUID", "false"));
                 imageIcon = Boolean.parseBoolean(props.getProperty("imageIcon", "true"));
+                proximity = Boolean.parseBoolean(props.getProperty("proximity", "false"));
                 selectIndex = Integer.parseInt(props.getProperty("selectIndex", "0"));
                 customDir = props.getProperty("customDir", "");
                 customSymbol = props.getProperty("customSymbol", "⬤");
@@ -172,6 +212,7 @@ public class LocatorDisplayConfig {
         props.setProperty("enabled", Boolean.toString(enabled));
         props.setProperty("onlineUUID", Boolean.toString(onlineUUID));
         props.setProperty("imageIcon", Boolean.toString(imageIcon));
+        props.setProperty("proximity", Boolean.toString(proximity));
         props.setProperty("selectIndex", Integer.toString(selectIndex));
         props.setProperty("customDir", customDir != null ? customDir : "");
         props.setProperty("customSymbol", customSymbol != null ? customSymbol : "⬤");
