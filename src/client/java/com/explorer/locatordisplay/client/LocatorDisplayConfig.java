@@ -42,6 +42,7 @@ public class LocatorDisplayConfig {
     public static void resetToDefaults() {
         enabled = true;
         onlineUUID = false;
+        proximity = false;
         imageIcon = true;
         selectIndex = 0;
         customDir = "";
@@ -53,6 +54,7 @@ public class LocatorDisplayConfig {
     public static boolean isDefault() {
         return enabled
             && !onlineUUID
+            && !proximity
             && imageIcon
             && selectIndex == 0
             && (customDir == null || customDir.isEmpty())
@@ -200,8 +202,8 @@ public class LocatorDisplayConfig {
                 props.load(in);
                 enabled = Boolean.parseBoolean(props.getProperty("enabled", "true"));
                 onlineUUID = Boolean.parseBoolean(props.getProperty("onlineUUID", "false"));
-                imageIcon = Boolean.parseBoolean(props.getProperty("imageIcon", "true"));
                 proximity = Boolean.parseBoolean(props.getProperty("proximity", "false"));
+                imageIcon = Boolean.parseBoolean(props.getProperty("imageIcon", "true"));
                 selectIndex = Integer.parseInt(props.getProperty("selectIndex", "0"));
                 customDir = props.getProperty("customDir", "");
                 customSymbol = props.getProperty("customSymbol", "⬤");
@@ -215,8 +217,8 @@ public class LocatorDisplayConfig {
         Properties props = new Properties();
         props.setProperty("enabled", Boolean.toString(enabled));
         props.setProperty("onlineUUID", Boolean.toString(onlineUUID));
-        props.setProperty("imageIcon", Boolean.toString(imageIcon));
         props.setProperty("proximity", Boolean.toString(proximity));
+        props.setProperty("imageIcon", Boolean.toString(imageIcon));
         props.setProperty("selectIndex", Integer.toString(selectIndex));
         props.setProperty("customDir", customDir != null ? customDir : "");
         props.setProperty("customSymbol", customSymbol != null ? customSymbol : "⬤");
