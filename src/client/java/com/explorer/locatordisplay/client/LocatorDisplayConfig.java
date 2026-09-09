@@ -101,6 +101,9 @@ public class LocatorDisplayConfig {
         net.minecraft.client.Minecraft minecraftClient = net.minecraft.client.Minecraft.getInstance();
         if (minecraftClient.player == null) return DEFAULT_ICON;
 
+        // fixed for the client
+        if (minecraftClient.player.getUUID().equals(playerId)) return DEFAULT_ICON;
+
         ClientWaypointManager manager = Objects.requireNonNull(minecraftClient.getConnection()).getWaypointManager();
         if (manager == null) return DEFAULT_ICON;
 
@@ -111,20 +114,21 @@ public class LocatorDisplayConfig {
         TrackedWaypoint targetPlayerWaypoint = waypoints.get(Either.left(playerId));
         if (targetPlayerWaypoint != null) {
             double squaredDistanceBlocks = targetPlayerWaypoint.distanceSquared(minecraftClient.player);
-            //hardcoded values bc I couldn't find what mojang uses (yet)
-            if (squaredDistanceBlocks < 115 * 115) {
+            // hardcoded values >_< through trial and error
+            // as precise as I can get, values in the wikis are all incorrect
+            // very small error of [0.5 - 1] block(s)
+            if (squaredDistanceBlocks < 127.0 * 127.0) {
                 return Identifier.withDefaultNamespace("hud/locator_bar_dot/default_0"); // Near
-            } else if (squaredDistanceBlocks < 235 * 235) {
+            } else if (squaredDistanceBlocks < 230.0 * 230.0) {
                 return Identifier.withDefaultNamespace("hud/locator_bar_dot/default_1"); // Nearby
-            } else if (squaredDistanceBlocks < 335 * 335) {
+            } else if (squaredDistanceBlocks < 331.0 * 331.0) {
                 return Identifier.withDefaultNamespace("hud/locator_bar_dot/default_2"); // Far
             } else {
                 return Identifier.withDefaultNamespace("hud/locator_bar_dot/default_3"); // Distant
             }
         }
-        // didnt work as intended
-        // return Identifier.withDefaultNamespace("hud/locator_bar_dot/bowtie"); //diff dimension? instead of default
-        return DEFAULT_ICON;
+
+        return Identifier.withDefaultNamespace("hud/locator_bar_dot/bowtie"); //diff dimension? instead of default
     }
 
     //mc 26.2 dirs @assets/textures/
