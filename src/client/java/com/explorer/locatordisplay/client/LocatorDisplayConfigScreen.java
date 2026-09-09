@@ -12,6 +12,7 @@ public class LocatorDisplayConfigScreen extends Screen {
     private Button enabledButton;
     private Button uuidSourceButton;
     private Button proximityDetectionButton;
+    private Button colorNameButton;
     private Button iconTypeButton;
     private Button symbolButton;
     private EditBox customBox;
@@ -61,6 +62,15 @@ public class LocatorDisplayConfigScreen extends Screen {
                 }).bounds(centerX, startY + (spacing * 2), width, height).build()
         );
 
+        // color name button
+        this.colorNameButton = this.addRenderableWidget(
+                Button.builder(Component.empty(), button -> {
+                    LocatorDisplayConfig.colorName = !LocatorDisplayConfig.colorName;
+                    LocatorDisplayConfig.save();
+                    this.updateWidgetStates();
+                }).bounds(centerX, startY + (spacing * 3), width, height).build()
+        );
+
         // icon type button
         this.iconTypeButton = this.addRenderableWidget(
                 Button.builder(Component.empty(), button -> {
@@ -68,7 +78,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                     LocatorDisplayConfig.selectIndex = 0;
                     LocatorDisplayConfig.save();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 3), width, height).build()
+                }).bounds(centerX, startY + (spacing * 4), width, height).build()
         );
 
         // symbol customizer button
@@ -80,11 +90,11 @@ public class LocatorDisplayConfigScreen extends Screen {
                             : LocatorDisplayConfig.SYMBOLS.length);
                     LocatorDisplayConfig.save();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 4), width, height).build()
+                }).bounds(centerX, startY + (spacing * 5), width, height).build()
         );
 
         // custom symbol/icon textbox
-        this.customBox = new EditBox(this.font, centerX, startY + (spacing * 5), width, height, Component.literal("Custom"));
+        this.customBox = new EditBox(this.font, centerX, startY + (spacing * 6), width, height, Component.literal("Custom"));
         this.addRenderableWidget(this.customBox);
 
         // splitting bottom area for defaults & done buttons to be side-by-side
@@ -95,7 +105,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                 Button.builder(Component.literal("Defaults"), button -> {
                     LocatorDisplayConfig.resetToDefaults();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 6) + 15, halfWidth, height).build()
+                }).bounds(centerX, startY + (spacing * 7) + 15, halfWidth, height).build()
         );
 
         // done button
@@ -104,7 +114,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                     if (this.minecraft != null) {
                         this.minecraft.gui.setScreen(this.parent);
                     }
-                }).bounds(centerX + halfWidth + 4, startY + (spacing * 6) + 15, halfWidth, height).build()
+                }).bounds(centerX + halfWidth + 4, startY + (spacing * 7) + 15, halfWidth, height).build()
         );
 
         this.updateWidgetStates(); // updates/refreshes the contents when a change occurs
@@ -124,7 +134,10 @@ public class LocatorDisplayConfigScreen extends Screen {
                 "UUID Source: " + (LocatorDisplayConfig.onlineUUID ? "Official Mojang" : "Server-Provided")
         ));
         this.proximityDetectionButton.setMessage(Component.literal(
-                "Proximity: " + (LocatorDisplayConfig.proximity ? "Enabled" : "Disabled")
+                "Proximity Detection: " + (LocatorDisplayConfig.proximity ? "ON" : "OFF")
+        ));
+        this.colorNameButton.setMessage(Component.literal(
+                "Color Name: " + (LocatorDisplayConfig.colorName ? "ON" : "OFF")
         ));
         this.iconTypeButton.setMessage(Component.literal(
                 "Icon Type: " + (LocatorDisplayConfig.imageIcon ? "Texture" : "Symbol")
@@ -136,7 +149,8 @@ public class LocatorDisplayConfigScreen extends Screen {
         ));
 
         this.uuidSourceButton.active = this.iconTypeButton.active = this.symbolButton.active
-                                     = this.proximityDetectionButton.active = isLocatorEnabled;
+                                     = this.proximityDetectionButton.active = this.colorNameButton.active
+                                     = isLocatorEnabled;
 
         boolean customActive = isLocatorEnabled && LocatorDisplayConfig.isCustomSelected() && !LocatorDisplayConfig.proximity;
 

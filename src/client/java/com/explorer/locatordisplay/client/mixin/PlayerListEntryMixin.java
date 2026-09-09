@@ -96,16 +96,21 @@ public abstract class PlayerListEntryMixin {
 			originalName = Component.literal(playerName);
 		}
 
+		MutableComponent modifiedName = originalName.copy();
+		if(LocatorDisplayConfig.colorName) {
+			modifiedName.setStyle(modifiedName.getStyle().withColor(rgbColor));
+		}
+
 		if (!LocatorDisplayConfig.imageIcon) {
 			String pickedSymbol = LocatorDisplayConfig.getCurrentSelection() + " ";
 			Component prefixComponent = Component.literal(pickedSymbol)
 					.setStyle(Style.EMPTY.withColor(rgbColor));
 
-			MutableComponent modifiedName = Component.empty()
+			modifiedName = Component.empty()
 					.append(prefixComponent)
-					.append(originalName);
-
-			cir.setReturnValue(modifiedName);
+					.append(modifiedName);
 		}
+
+		cir.setReturnValue(modifiedName);
 	}
 }

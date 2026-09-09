@@ -26,8 +26,9 @@ public class LocatorDisplayConfig {
 
     public static boolean enabled = true;
     public static boolean onlineUUID = false;
-    public static boolean imageIcon = true;
     public static boolean proximity = false;
+    public static boolean colorName = false;
+    public static boolean imageIcon = true;
 
     // icon
     public static final String[] ICONS = {"Near", "Nearby", "Far", "Distant", "Bowtie", "Custom"};
@@ -43,6 +44,7 @@ public class LocatorDisplayConfig {
         enabled = true;
         onlineUUID = false;
         proximity = false;
+        colorName = false;
         imageIcon = true;
         selectIndex = 0;
         customDir = "";
@@ -55,6 +57,7 @@ public class LocatorDisplayConfig {
         return enabled
             && !onlineUUID
             && !proximity
+            && !colorName
             && imageIcon
             && selectIndex == 0
             && (customDir == null || customDir.isEmpty())
@@ -203,6 +206,7 @@ public class LocatorDisplayConfig {
                 enabled = Boolean.parseBoolean(props.getProperty("enabled", "true"));
                 onlineUUID = Boolean.parseBoolean(props.getProperty("onlineUUID", "false"));
                 proximity = Boolean.parseBoolean(props.getProperty("proximity", "false"));
+                colorName = Boolean.parseBoolean(props.getProperty("colorName", "false"));
                 imageIcon = Boolean.parseBoolean(props.getProperty("imageIcon", "true"));
                 selectIndex = Integer.parseInt(props.getProperty("selectIndex", "0"));
                 customDir = props.getProperty("customDir", "");
@@ -218,6 +222,7 @@ public class LocatorDisplayConfig {
         props.setProperty("enabled", Boolean.toString(enabled));
         props.setProperty("onlineUUID", Boolean.toString(onlineUUID));
         props.setProperty("proximity", Boolean.toString(proximity));
+        props.setProperty("colorName", Boolean.toString(colorName));
         props.setProperty("imageIcon", Boolean.toString(imageIcon));
         props.setProperty("selectIndex", Integer.toString(selectIndex));
         props.setProperty("customDir", customDir != null ? customDir : "");
