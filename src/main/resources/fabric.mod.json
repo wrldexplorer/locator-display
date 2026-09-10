@@ -54,5 +54,7 @@
 			},
 			"update_checker": true
 		}
-	}
+	},
+
+	"accessWidener": "locator-display.accesswidener"
 }

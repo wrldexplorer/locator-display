@@ -1,11 +1,12 @@
 package com.explorer.locatordisplay.client;
 
+import org.jspecify.annotations.NonNull;
+
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import org.jspecify.annotations.NonNull;
 
 public class LocatorDisplayConfigScreen extends Screen {
     private final Screen parent;
@@ -150,7 +151,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                 "Color Name: " + (LocatorDisplayConfig.colorName ? "ON" : "OFF")
         ));
         this.disableLocatorBarButton.setMessage(Component.literal(
-                "Disable Locator Bar: " + (LocatorDisplayConfig.colorName ? "ON" : "OFF")
+                "Disable Locator Bar: " + (LocatorDisplayConfig.disableLocatorBar ? "ON" : "OFF")
         ));
         this.iconTypeButton.setMessage(Component.literal(
                 "Icon Type: " + (LocatorDisplayConfig.imageIcon ? "Texture" : "Symbol")

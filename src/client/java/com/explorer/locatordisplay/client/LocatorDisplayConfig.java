@@ -1,11 +1,13 @@
 package com.explorer.locatordisplay.client;
 
 import com.explorer.locatordisplay.client.mixin.ClientWaypointManagerAccessor;
-import com.mojang.datafixers.util.Either;
 import net.fabricmc.loader.api.FabricLoader;
+
+import com.mojang.datafixers.util.Either;
 import net.minecraft.client.waypoints.ClientWaypointManager;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.waypoints.TrackedWaypoint;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
