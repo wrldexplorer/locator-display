@@ -11,17 +11,14 @@ import net.minecraft.network.chat.Component;
 public class LocatorDisplayConfigScreen extends Screen {
     private final Screen parent;
     private Button enabledButton;
-    private Button uuidSourceButton;
     private Button proximityDetectionButton;
-    private Button colorNameButton;
-    private Button disableLocatorBarButton;
     private Button iconTypeButton;
     private Button symbolButton;
     private EditBox customBox;
     private Button defaultsButton;
 
     public LocatorDisplayConfigScreen(Screen parent) {
-        super(Component.literal("Locator Display Config"));
+        super(Component.literal("Locator Display Options"));
         this.parent = parent;
     }
 
@@ -42,15 +39,6 @@ public class LocatorDisplayConfigScreen extends Screen {
                 }).bounds(centerX, startY, width, height).build()
         );
 
-        // UUID fetching button
-        this.uuidSourceButton = this.addRenderableWidget(
-                Button.builder(Component.empty(), button -> {
-                    LocatorDisplayConfig.onlineUUID = !LocatorDisplayConfig.onlineUUID;
-                    LocatorDisplayConfig.save();
-                    this.updateWidgetStates();
-                }).bounds(centerX, startY + spacing, width, height).build()
-        );
-
         // proximity detection button
         this.proximityDetectionButton = this.addRenderableWidget(
                 Button.builder(Component.empty(), button -> {
@@ -61,25 +49,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                     }
                     LocatorDisplayConfig.save();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 2), width, height).build()
-        );
-
-        // color name button
-        this.colorNameButton = this.addRenderableWidget(
-                Button.builder(Component.empty(), button -> {
-                    LocatorDisplayConfig.colorName = !LocatorDisplayConfig.colorName;
-                    LocatorDisplayConfig.save();
-                    this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 3), width, height).build()
-        );
-
-        // locator bar visibility button
-        this.disableLocatorBarButton = this.addRenderableWidget(
-                Button.builder(Component.empty(), button -> {
-                    LocatorDisplayConfig.disableLocatorBar = !LocatorDisplayConfig.disableLocatorBar;
-                    LocatorDisplayConfig.save();
-                    this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 4), width, height).build()
+                }).bounds(centerX, startY + spacing, width, height).build()
         );
 
         // icon type button
@@ -89,7 +59,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                     LocatorDisplayConfig.selectIndex = 0;
                     LocatorDisplayConfig.save();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 5), width, height).build()
+                }).bounds(centerX, startY + (spacing * 2), width, height).build()
         );
 
         // symbol customizer button
@@ -101,12 +71,21 @@ public class LocatorDisplayConfigScreen extends Screen {
                             : LocatorDisplayConfig.SYMBOLS.length);
                     LocatorDisplayConfig.save();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 6), width, height).build()
+                }).bounds(centerX, startY + (spacing * 3), width, height).build()
         );
 
         // custom symbol/icon textbox
-        this.customBox = new EditBox(this.font, centerX, startY + (spacing * 7), width, height, Component.literal("Custom"));
+        this.customBox = new EditBox(this.font, centerX, startY + (spacing * 4), width, height, Component.literal("Custom"));
         this.addRenderableWidget(this.customBox);
+
+        // advanced options button
+        this.addRenderableWidget(
+                Button.builder(Component.literal("Advanced Options"), button -> {
+                    if (this.minecraft != null) {
+                        this.minecraft.gui.setScreen(new LocatorDisplayAdvancedConfigScreen(this));
+                    }
+                }).bounds(centerX, startY + (spacing * 5), width, height).build()
+        );
 
         // splitting bottom area for defaults & done buttons to be side-by-side
         int halfWidth = (width - 4) / 2; // 88px each w/ 4px gap
@@ -116,7 +95,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                 Button.builder(Component.literal("Defaults"), button -> {
                     LocatorDisplayConfig.resetToDefaults();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 8) + 15, halfWidth, height).build()
+                }).bounds(centerX, startY + (spacing * 6) + 15, halfWidth, height).build()
         );
 
         // done button
@@ -125,7 +104,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                     if (this.minecraft != null) {
                         this.minecraft.gui.setScreen(this.parent);
                     }
-                }).bounds(centerX + halfWidth + 4, startY + (spacing * 8) + 15, halfWidth, height).build()
+                }).bounds(centerX + halfWidth + 4, startY + (spacing * 6) + 15, halfWidth, height).build()
         );
 
         this.updateWidgetStates(); // updates/refreshes the contents when a change occurs
@@ -141,17 +120,8 @@ public class LocatorDisplayConfigScreen extends Screen {
         boolean isLocatorEnabled = LocatorDisplayConfig.enabled;
 
         this.enabledButton.setMessage(Component.literal("Enabled: " + (isLocatorEnabled ? "ON" : "OFF")));
-        this.uuidSourceButton.setMessage(Component.literal(
-                "UUID Source: " + (LocatorDisplayConfig.onlineUUID ? "Official Mojang" : "Server-Provided")
-        ));
         this.proximityDetectionButton.setMessage(Component.literal(
                 "Proximity Detection: " + (LocatorDisplayConfig.proximity ? "ON" : "OFF")
-        ));
-        this.colorNameButton.setMessage(Component.literal(
-                "Color Name: " + (LocatorDisplayConfig.colorName ? "ON" : "OFF")
-        ));
-        this.disableLocatorBarButton.setMessage(Component.literal(
-                "Disable Locator Bar: " + (LocatorDisplayConfig.disableLocatorBar ? "ON" : "OFF")
         ));
         this.iconTypeButton.setMessage(Component.literal(
                 "Icon Type: " + (LocatorDisplayConfig.imageIcon ? "Texture" : "Symbol")
@@ -162,9 +132,9 @@ public class LocatorDisplayConfigScreen extends Screen {
                 : ("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.selectIndex])
         ));
 
-        this.uuidSourceButton.active = this.iconTypeButton.active = this.symbolButton.active
-                                     = this.proximityDetectionButton.active = this.colorNameButton.active
-                                     = isLocatorEnabled;
+        this.iconTypeButton.active = this.symbolButton.active
+                                   = this.proximityDetectionButton.active
+                                   = isLocatorEnabled;
 
         boolean customActive = isLocatorEnabled && LocatorDisplayConfig.isCustomSelected() && !LocatorDisplayConfig.proximity;
 

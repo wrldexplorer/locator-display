@@ -10,9 +10,12 @@ next to player names in the tab list, colored exactly like their locator bar col
 
 ## Features
 - Displays a customizable colored symbol before each player's name in the tab list.
-- Customize the symbol by choosing one of the characters in the preset or by specifying a custom one. 
-- Characters in the Preset: `⬤, ▌, ⬛, ★, ◆, ▶, ✚, ✖`
-- Uses the official Mojang UUID for accurate colors.
+- Customize the symbol by choosing one of the characters in the preset or by specifying a custom one: `⬤, ▌, ⬛, ★, ◆, ▶, ✚, ✖`
+- Display an icon or a texture instead of a symbol.
+- Choose to color the names in the calculated UUID color.
+- Proximity Detection shows how har or near a player is from you.
+- Enables disabling the locator bar and only displaying the experience bar.
+- Choose to use the Server-Provided or the official Mojang UUID for accurate colors.
 - Falls back to a deterministic offline UUID for players not registered with Mojang.
 - Fully client-side; works on any SMP.
 - Turns off in servers with thousand of players in the tab list(minigames, pvp servers)
@@ -39,13 +42,9 @@ next to player names in the tab list, colored exactly like their locator bar col
 <hr>
 
 ## How It Works
-1. The mod fetches the player's Mojang UUID from the public Mojang API (asynchronously).
-2. It computes a color from the UUID using Java's hash code algorithm (same as the locator bar).
+1. The mod fetches the player's UUID either from the client or from the public Mojang API.
+2. It computes a color from the UUID using the same algorithm as the locator bar.
 3. The specified symbol is prepended to the player's name in the tab list.
-
-> NOTE: If the player name does not exist in Mojang's database (e.g., offline/cracked server), 
-> the mod uses the standard offline UUID (`UUID.nameUUIDFromBytes("OfflinePlayer:<name>")`) 
-> so the color remains stable.
 
 <hr>
 
