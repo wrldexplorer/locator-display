@@ -11,7 +11,6 @@ import net.minecraft.network.chat.Component;
 public class LocatorDisplayConfigScreen extends Screen {
     private final Screen parent;
     private Button enabledButton;
-    private Button proximityDetectionButton;
     private Button iconTypeButton;
     private Button symbolButton;
     private EditBox customBox;
@@ -39,19 +38,6 @@ public class LocatorDisplayConfigScreen extends Screen {
                 }).bounds(centerX, startY, width, height).build()
         );
 
-        // proximity detection button
-        this.proximityDetectionButton = this.addRenderableWidget(
-                Button.builder(Component.empty(), button -> {
-                    LocatorDisplayConfig.proximity = !LocatorDisplayConfig.proximity;
-                    if (LocatorDisplayConfig.proximity) {
-                        LocatorDisplayConfig.imageIcon = true;
-                        LocatorDisplayConfig.selectIndex = 0;
-                    }
-                    LocatorDisplayConfig.save();
-                    this.updateWidgetStates();
-                }).bounds(centerX, startY + spacing, width, height).build()
-        );
-
         // icon type button
         this.iconTypeButton = this.addRenderableWidget(
                 Button.builder(Component.empty(), button -> {
@@ -59,7 +45,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                     LocatorDisplayConfig.selectIndex = 0;
                     LocatorDisplayConfig.save();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 2), width, height).build()
+                }).bounds(centerX, startY + spacing, width, height).build()
         );
 
         // symbol customizer button
@@ -71,11 +57,11 @@ public class LocatorDisplayConfigScreen extends Screen {
                             : LocatorDisplayConfig.SYMBOLS.length);
                     LocatorDisplayConfig.save();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 3), width, height).build()
+                }).bounds(centerX, startY + (spacing * 2), width, height).build()
         );
 
         // custom symbol/icon textbox
-        this.customBox = new EditBox(this.font, centerX, startY + (spacing * 4), width, height, Component.literal("Custom"));
+        this.customBox = new EditBox(this.font, centerX, startY + (spacing * 3), width, height, Component.literal("Custom"));
         this.addRenderableWidget(this.customBox);
 
         // advanced options button
@@ -84,7 +70,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                     if (this.minecraft != null) {
                         this.minecraft.gui.setScreen(new LocatorDisplayAdvancedConfigScreen(this));
                     }
-                }).bounds(centerX, startY + (spacing * 5), width, height).build()
+                }).bounds(centerX, startY + (spacing * 4), width, height).build()
         );
 
         // splitting bottom area for defaults & done buttons to be side-by-side
@@ -95,7 +81,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                 Button.builder(Component.literal("Defaults"), button -> {
                     LocatorDisplayConfig.resetToDefaults();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 6) + 15, halfWidth, height).build()
+                }).bounds(centerX, startY + (spacing * 5) + 15, halfWidth, height).build()
         );
 
         // done button
@@ -104,7 +90,7 @@ public class LocatorDisplayConfigScreen extends Screen {
                     if (this.minecraft != null) {
                         this.minecraft.gui.setScreen(this.parent);
                     }
-                }).bounds(centerX + halfWidth + 4, startY + (spacing * 6) + 15, halfWidth, height).build()
+                }).bounds(centerX + halfWidth + 4, startY + (spacing * 5) + 15, halfWidth, height).build()
         );
 
         this.updateWidgetStates(); // updates/refreshes the contents when a change occurs
@@ -120,9 +106,7 @@ public class LocatorDisplayConfigScreen extends Screen {
         boolean isLocatorEnabled = LocatorDisplayConfig.enabled;
 
         this.enabledButton.setMessage(Component.literal("Enabled: " + (isLocatorEnabled ? "ON" : "OFF")));
-        this.proximityDetectionButton.setMessage(Component.literal(
-                "Proximity Detection: " + (LocatorDisplayConfig.proximity ? "ON" : "OFF")
-        ));
+
         this.iconTypeButton.setMessage(Component.literal(
                 "Icon Type: " + (LocatorDisplayConfig.imageIcon ? "Texture" : "Symbol")
         ));
@@ -133,13 +117,12 @@ public class LocatorDisplayConfigScreen extends Screen {
         ));
 
         this.iconTypeButton.active = this.symbolButton.active
-                                   = this.proximityDetectionButton.active
                                    = isLocatorEnabled;
 
         boolean customActive = isLocatorEnabled && LocatorDisplayConfig.isCustomSelected() && !LocatorDisplayConfig.proximity;
 
         if(LocatorDisplayConfig.proximity) {
-            customActive = this.iconTypeButton.active = this.symbolButton.active = false;
+            this.iconTypeButton.active = this.symbolButton.active = false;
         }
 
         this.customBox.setEditable(customActive);

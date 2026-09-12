@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 public class LocatorDisplayAdvancedConfigScreen extends Screen {
     private final Screen parent;
     private Button uuidSourceButton;
+    private Button proximityDetectionButton;
     private Button colorNameButton;
     private Button disableLocatorBarButton;
 
@@ -20,7 +21,7 @@ public class LocatorDisplayAdvancedConfigScreen extends Screen {
     @Override
     protected void init() {
         int centerX = this.width / 2 - 90;
-        int startY = this.height / 2 - 50;
+        int startY = this.height / 2 - 90;
         int width = 180;
         int height = 20;
         int spacing = 24;
@@ -34,13 +35,26 @@ public class LocatorDisplayAdvancedConfigScreen extends Screen {
                 }).bounds(centerX, startY, width, height).build()
         );
 
+        // proximity detection button
+        this.proximityDetectionButton = this.addRenderableWidget(
+                Button.builder(Component.empty(), button -> {
+                    LocatorDisplayConfig.proximity = !LocatorDisplayConfig.proximity;
+                    if (LocatorDisplayConfig.proximity) {
+                        LocatorDisplayConfig.imageIcon = true;
+                        LocatorDisplayConfig.selectIndex = 0;
+                    }
+                    LocatorDisplayConfig.save();
+                    this.updateWidgetStates();
+                }).bounds(centerX, startY + spacing, width, height).build()
+        );
+
         // color name button
         this.colorNameButton = this.addRenderableWidget(
                 Button.builder(Component.empty(), button -> {
                     LocatorDisplayConfig.colorName = !LocatorDisplayConfig.colorName;
                     LocatorDisplayConfig.save();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + spacing, width, height).build()
+                }).bounds(centerX, startY + (spacing * 2), width, height).build()
         );
 
         // locator bar visibility button
@@ -49,7 +63,7 @@ public class LocatorDisplayAdvancedConfigScreen extends Screen {
                     LocatorDisplayConfig.disableLocatorBar = !LocatorDisplayConfig.disableLocatorBar;
                     LocatorDisplayConfig.save();
                     this.updateWidgetStates();
-                }).bounds(centerX, startY + (spacing * 2), width, height).build()
+                }).bounds(centerX, startY + (spacing * 3), width, height).build()
         );
 
         // back button
@@ -58,7 +72,7 @@ public class LocatorDisplayAdvancedConfigScreen extends Screen {
                     if (this.minecraft != null) {
                         this.minecraft.gui.setScreen(this.parent);
                     }
-                }).bounds(centerX, startY + (spacing * 4), width, height).build()
+                }).bounds(centerX, startY + (spacing * 4) + 15, width, height).build()
         );
 
         this.updateWidgetStates();
@@ -68,6 +82,9 @@ public class LocatorDisplayAdvancedConfigScreen extends Screen {
         this.uuidSourceButton.setMessage(Component.literal(
                 "UUID Source: " + (LocatorDisplayConfig.onlineUUID ? "Official Mojang" : "Server-Provided")
         ));
+        this.proximityDetectionButton.setMessage(Component.literal(
+                "Proximity Detection: " + (LocatorDisplayConfig.proximity ? "ON" : "OFF")
+        ));
         this.colorNameButton.setMessage(Component.literal(
                 "Color Name: " + (LocatorDisplayConfig.colorName ? "ON" : "OFF")
         ));
@@ -75,7 +92,9 @@ public class LocatorDisplayAdvancedConfigScreen extends Screen {
                 "Disable Locator Bar: " + (LocatorDisplayConfig.disableLocatorBar ? "ON" : "OFF")
         ));
 
-        this.uuidSourceButton.active = this.colorNameButton.active = LocatorDisplayConfig.enabled;
+        this.uuidSourceButton.active = this.colorNameButton.active
+                                     = this.proximityDetectionButton.active
+                                     = LocatorDisplayConfig.enabled;
     }
 
     @Override
