@@ -68,7 +68,7 @@ public class LocatorDisplayConfigScreen extends Screen {
         this.addRenderableWidget(
                 Button.builder(Component.literal("Advanced Options"), button -> {
                     if (this.minecraft != null) {
-                        this.minecraft.gui.setScreen(new LocatorDisplayAdvancedConfigScreen(this));
+                        this.minecraft.setScreen(new LocatorDisplayAdvancedConfigScreen(this));
                     }
                 }).bounds(centerX, startY + (spacing * 4), width, height).build()
         );
@@ -88,7 +88,7 @@ public class LocatorDisplayConfigScreen extends Screen {
         this.addRenderableWidget(
                 Button.builder(Component.literal("Done"), button -> {
                     if (this.minecraft != null) {
-                        this.minecraft.gui.setScreen(this.parent);
+                        this.minecraft.setScreen(this.parent);
                     }
                 }).bounds(centerX + halfWidth + 4, startY + (spacing * 5) + 15, halfWidth, height).build()
         );

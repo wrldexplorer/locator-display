@@ -70,7 +70,7 @@ public class LocatorDisplayAdvancedConfigScreen extends Screen {
         this.addRenderableWidget(
                 Button.builder(Component.literal("Back"), button -> {
                     if (this.minecraft != null) {
-                        this.minecraft.gui.setScreen(this.parent);
+                        this.minecraft.setScreen(this.parent);
                     }
                 }).bounds(centerX, startY + (spacing * 4) + 15, width, height).build()
         );

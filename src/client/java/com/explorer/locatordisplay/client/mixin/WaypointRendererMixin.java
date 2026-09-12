@@ -3,7 +3,7 @@ package com.explorer.locatordisplay.client.mixin;
 import com.explorer.locatordisplay.client.LocatorDisplayConfig;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.contextualbar.LocatorBar;
+import net.minecraft.client.gui.contextualbar.LocatorBarRenderer;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 // for creative and spectator
-@Mixin(LocatorBar.class)
+@Mixin(LocatorBarRenderer.class)
 public class WaypointRendererMixin {
 
     @Inject(
