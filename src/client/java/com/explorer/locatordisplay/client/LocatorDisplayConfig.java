@@ -4,6 +4,7 @@ import com.explorer.locatordisplay.client.mixin.ClientWaypointManagerAccessor;
 import net.fabricmc.loader.api.FabricLoader;
 
 import com.mojang.datafixers.util.Either;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.waypoints.ClientWaypointManager;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.waypoints.TrackedWaypoint;
@@ -25,6 +26,17 @@ public class LocatorDisplayConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger("LocatorDisplay");
     private static final Path CONFIG_FILE =
             FabricLoader.getInstance().getConfigDir().resolve("locator-display.properties");
+
+    // should only show the xp bar in survival and adventure
+    // and not in creative and spectator
+    public static boolean showXP() {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft == null || minecraft.player == null) {
+            return false;
+        }
+
+        return !minecraft.player.isSpectator() && !minecraft.player.isCreative();
+    }
 
     public static boolean enabled = true;
     public static boolean onlineUUID = false;
