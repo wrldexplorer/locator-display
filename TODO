@@ -1,4 +1,2 @@
 Features:
-Make the symbol the shape of the locator bar icon
-Add proximity detection option on/off
-Add proximity detection(dot gets smaller/bigger according to the distance)
+add commands to toggle options(maybe in the future) - needs the fabric api
