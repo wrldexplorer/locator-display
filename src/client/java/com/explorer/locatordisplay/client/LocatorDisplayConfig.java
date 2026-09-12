@@ -1,8 +1,13 @@
 package com.explorer.locatordisplay.client;
 
 import net.fabricmc.loader.api.FabricLoader;
+
+import com.mojang.datafixers.util.Either;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.world.waypoint.ServerWaypoint;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.waypoint.TrackedWaypoint;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +16,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
+import java.util.UUID;
 
 public class LocatorDisplayConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger("LocatorDisplay");
@@ -89,8 +97,123 @@ public class LocatorDisplayConfig {
         return activeArray[selectIndex];
     }
 
-    public static final Identifier DEFAULT_ICON = Identifier.withDefaultNamespace("hud/locator_bar_dot/default_0");
+    public static final Identifier DEFAULT_ICON = Identifier.ofVanilla("hud/locator_bar_dot/default_0");
+    public static Identifier getSelectedIconIdentifier() {
 
+        if (isCustomSelected()) {
+            if (customDir == null || customDir.isBlank()) {
+                return DEFAULT_ICON;
+            }
+            return resolveCustomIdentifier(customDir);
+        }
+
+        String selection = getCurrentSelection();
+        return switch (selection) {
+            case "Nearby" -> Identifier.ofVanilla("hud/locator_bar_dot/default_1");
+            case "Far" -> Identifier.ofVanilla("hud/locator_bar_dot/default_2");
+            case "Distant" -> Identifier.ofVanilla("hud/locator_bar_dot/default_3");
+            case "Bowtie" -> Identifier.ofVanilla("hud/locator_bar_dot/bowtie");
+            default -> DEFAULT_ICON;
+        };
+    }
+
+    // helper method to calculate distance and return the correct icon for proximity detection
+    public static Identifier getProximityIcon(UUID playerId) {
+        net.minecraft.client.MinecraftClient minecraftClient = net.minecraft.client.MinecraftClient.getInstance();
+        if (minecraftClient.player == null) return DEFAULT_ICON;
+
+        // fixed for the client
+        if (minecraftClient.player.getUuid().equals(playerId)) return DEFAULT_ICON;
+
+        ServerWaypoint manager = Objects.requireNonNull(minecraftClient.getNetworkHandler()).getWaypointHandler(); //TODO
+        if (manager == null) return DEFAULT_ICON;
+
+        // from mc waypoint calc
+        Map<Either<UUID, String>, TrackedWaypoint> waypoints =
+                ((ServerWaypoint) manager).getWaypointConfig(); //TODO
+
+        TrackedWaypoint targetPlayerWaypoint = waypoints.get(Either.left(playerId));
+        if (targetPlayerWaypoint != null) {
+            double squaredDistanceBlocks = targetPlayerWaypoint.squaredDistanceTo(minecraftClient.player);
+            // hardcoded values >_< through trial and error
+            // as precise as I can get, values in the wikis are all incorrect
+            // very small error of [0.5 - 1] block(s)
+            if (squaredDistanceBlocks < 127.0 * 127.0) {
+                return Identifier.ofVanilla("hud/locator_bar_dot/default_0"); // Near
+            } else if (squaredDistanceBlocks < 230.0 * 230.0) {
+                return Identifier.ofVanilla("hud/locator_bar_dot/default_1"); // Nearby
+            } else if (squaredDistanceBlocks < 331.0 * 331.0) {
+                return Identifier.ofVanilla("hud/locator_bar_dot/default_2"); // Far
+            } else {
+                return Identifier.ofVanilla("hud/locator_bar_dot/default_3"); // Distant
+            }
+        }
+
+        return Identifier.ofVanilla("hud/locator_bar_dot/bowtie"); //diff dimension? instead of default
+    }
+
+    //mc 26.2 dirs @assets/textures/
+    private static boolean isStandardTextureDir(String path) {
+        String[] dirs = {
+                "block", "colormap", "effect", "entity", "environment",
+                "font", "gui", "item", "map", "misc", "mob_effect",
+                "painting", "particle", "trims"
+        };
+        for (String dir : dirs) {
+            if (path.startsWith(dir + "/")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private static Identifier resolveCustomIdentifier(String pathInput) {
+        if (pathInput == null || pathInput.isBlank()) {
+            LOGGER.info("[LocatorDisplay] Invalid/Empty input detected, defaulting");
+            return DEFAULT_ICON;
+        }
+
+        pathInput = pathInput.trim();
+        String cleaned = pathInput.replace('\\', '/');
+        //default fallbacks
+        String namespace = "minecraft";
+        String path = cleaned;
+
+        // Extract namespace "modid:block/custom_block" or "minecraft:block/dirt"
+        if (cleaned.contains(":")) {
+            LOGGER.info("[LocatorDisplay] {} contains ':'", cleaned);
+            String[] split = cleaned.split(":", 2);
+            namespace = split[0].trim();
+            path = split[1].trim();
+        }
+
+        // Strip leading slash
+        if (path.startsWith("/")) {
+            LOGGER.info("[LocatorDisplay] {} starts with '/', stripping", path);
+            path = path.substring(1);
+        }
+
+        if (isStandardTextureDir(path) && !path.startsWith("textures/")) {
+            LOGGER.info("[LocatorDisplay] standard path doesnt start with 'textures/'");
+            path = "textures/" + path;
+        }
+
+        if (path.startsWith("textures/") && !path.endsWith(".png")) {
+            LOGGER.info("[LocatorDisplay] path doesnt end with 'png'");
+            path = path + ".png";
+        }
+        path = path.toLowerCase();
+
+        // Final safety check to completely prevent IdentifierException crashes
+        if (!Identifier.isNamespaceValid(namespace) || !Identifier.isPathValid(path)) {
+            LOGGER.error("[LocatorDisplay] Invalid custom icon identifier characters: {}:{}", namespace, path);
+            return DEFAULT_ICON;
+        }
+
+        LOGGER.info("[LocatorDisplay] Returning identifier with namespace:'{}', and path:'{}'", namespace, path);
+        return Identifier.of(namespace, path);
+    }
 
     public static void load() {
         if (Files.exists(CONFIG_FILE)) {
@@ -98,6 +221,14 @@ public class LocatorDisplayConfig {
             try (InputStream in = Files.newInputStream(CONFIG_FILE)) {
                 props.load(in);
                 enabled = Boolean.parseBoolean(props.getProperty("enabled", "true"));
+                onlineUUID = Boolean.parseBoolean(props.getProperty("onlineUUID", "false"));
+                proximity = Boolean.parseBoolean(props.getProperty("proximity", "false"));
+                colorName = Boolean.parseBoolean(props.getProperty("colorName", "false"));
+                disableLocatorBar = Boolean.parseBoolean(props.getProperty("disableLocatorBar", "false"));
+                imageIcon = Boolean.parseBoolean(props.getProperty("imageIcon", "true"));
+                selectIndex = Integer.parseInt(props.getProperty("selectIndex", "0"));
+                customDir = props.getProperty("customDir", "");
+                customSymbol = props.getProperty("customSymbol", "⬤");
             } catch (IOException e) {
                 LOGGER.error("Failed to load config", e);
             }
@@ -107,6 +238,14 @@ public class LocatorDisplayConfig {
     public static void save() {
         Properties props = new Properties();
         props.setProperty("enabled", Boolean.toString(enabled));
+        props.setProperty("onlineUUID", Boolean.toString(onlineUUID));
+        props.setProperty("proximity", Boolean.toString(proximity));
+        props.setProperty("colorName", Boolean.toString(colorName));
+        props.setProperty("disableLocatorBar", Boolean.toString(disableLocatorBar));
+        props.setProperty("imageIcon", Boolean.toString(imageIcon));
+        props.setProperty("selectIndex", Integer.toString(selectIndex));
+        props.setProperty("customDir", customDir != null ? customDir : "");
+        props.setProperty("customSymbol", customSymbol != null ? customSymbol : "⬤");
 
         try {
             if (Files.notExists(CONFIG_FILE.getParent())) {
