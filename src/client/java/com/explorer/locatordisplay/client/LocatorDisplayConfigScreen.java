@@ -38,14 +38,14 @@ public class LocatorDisplayConfigScreen extends Screen {
         // symbol customizer button
         this.addDrawableChild(
                 ButtonWidget.builder(
-                        Text.literal("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.symbolIndex]),
+                        Text.literal("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.selectIndex]),
                         button -> {
-                            LocatorDisplayConfig.symbolIndex = (LocatorDisplayConfig.symbolIndex + 1) % LocatorDisplayConfig.SYMBOLS.length;
+                            LocatorDisplayConfig.selectIndex = (LocatorDisplayConfig.selectIndex + 1) % LocatorDisplayConfig.SYMBOLS.length;
 
                             boolean customActive = LocatorDisplayConfig.isCustomSelected();
 
                             button.setMessage(
-                                    Text.literal("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.symbolIndex])
+                                    Text.literal("Symbol: " + LocatorDisplayConfig.SYMBOLS[LocatorDisplayConfig.selectIndex])
                             );
 
                             // Enable/disable text box interaction depending on selection
