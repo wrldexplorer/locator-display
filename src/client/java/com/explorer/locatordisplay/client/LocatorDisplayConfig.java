@@ -1,10 +1,10 @@
 package com.explorer.locatordisplay.client;
 
+import com.explorer.locatordisplay.client.mixin.ClientWaypointManagerAccessor;
 import net.fabricmc.loader.api.FabricLoader;
 
 import com.mojang.datafixers.util.Either;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.waypoint.ServerWaypoint;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.waypoint.TrackedWaypoint;
 
@@ -125,12 +125,12 @@ public class LocatorDisplayConfig {
         // fixed for the client
         if (minecraftClient.player.getUuid().equals(playerId)) return DEFAULT_ICON;
 
-        ServerWaypoint manager = Objects.requireNonNull(minecraftClient.getNetworkHandler()).getWaypointHandler(); //TODO
+        ClientWaypointManagerAccessor manager = (ClientWaypointManagerAccessor) Objects.requireNonNull(minecraftClient.getNetworkHandler()).getWaypointHandler();
         if (manager == null) return DEFAULT_ICON;
 
         // from mc waypoint calc
         Map<Either<UUID, String>, TrackedWaypoint> waypoints =
-                ((ServerWaypoint) manager).getWaypointConfig(); //TODO
+                ((ClientWaypointManagerAccessor) manager).getWaypoints();
 
         TrackedWaypoint targetPlayerWaypoint = waypoints.get(Either.left(playerId));
         if (targetPlayerWaypoint != null) {

@@ -3,7 +3,8 @@
 	"package": "com.explorer.locatordisplay.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"PlayerListEntryMixin"
+		"PlayerListEntryMixin",
+		"ClientWaypointManagerAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
