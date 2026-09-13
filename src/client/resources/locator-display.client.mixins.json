@@ -5,7 +5,9 @@
 	"client": [
 		"PlayerListEntryMixin",
 		"ClientWaypointManagerAccessor",
-		"TabMenuOverlayMixin"
+		"TabMenuOverlayMixin",
+		"ExperienceRendererMixin",
+		"WaypointRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
