@@ -42,8 +42,8 @@ public abstract class PlayerListEntryMixin {
 		}
 
 		GameProfile profile = getProfile();
-		String playerName = profile.name();
-		UUID playerUUID = profile.id();
+		String playerName = profile.getName();
+		UUID playerUUID = profile.getId();
 
 		// skip unnamed entries - npc? etc? whatever server have
 		if (playerName == null || playerName.isEmpty()) {

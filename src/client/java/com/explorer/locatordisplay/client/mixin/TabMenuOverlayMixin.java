@@ -61,7 +61,7 @@ public class TabMenuOverlayMixin {
                 && !LocatorDisplayConfig.getCurrentSelection().equals("Bowtie");
 
         if (useProximity) {
-            iconIdentifier = LocatorDisplayConfig.getProximityIcon(playerEntry.getProfile().id());
+            iconIdentifier = LocatorDisplayConfig.getProximityIcon(playerEntry.getProfile().getId());
         } else {
             iconIdentifier = LocatorDisplayConfig.getSelectedIconIdentifier();
         }
@@ -69,7 +69,7 @@ public class TabMenuOverlayMixin {
         if (iconIdentifier == null || iconIdentifier.getPath().isEmpty()) return;
 
         // if player head is rendering, place the icon right after it @9px offset
-        int rgbColor = LocatorColorUtil.getColorFromUuid(playerEntry.getProfile().id());
+        int rgbColor = LocatorColorUtil.getColorFromUuid(playerEntry.getProfile().getId());
         int iconColorTint = 0xFF000000 | (rgbColor & 0x00FFFFFF);
 
         String path = iconIdentifier.getPath();
