@@ -4,7 +4,8 @@
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"PlayerListEntryMixin",
-		"ClientWaypointManagerAccessor"
+		"ClientWaypointManagerAccessor",
+		"TabMenuOverlayMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
